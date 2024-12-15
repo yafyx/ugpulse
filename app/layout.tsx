@@ -15,8 +15,13 @@ export const metadata: Metadata = {
     template: `%s - ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
+    apple: [
+      { url: "/icons/icon-192x192.png" },
+      { url: "/icons/icon-512x512.png" },
+    ],
   },
 };
 
@@ -34,7 +39,16 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning lang="en">
-      <head />
+      <head>
+        <meta name="application-name" content="UG Connect" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="UGC" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#000000" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+      </head>
       <body
         className={clsx(
           "bg-gradient-to-br from-[#f0f0f0] to-[#e0e0e0] font-sans antialiased dark:from-[#000000] dark:to-[#000000]",
