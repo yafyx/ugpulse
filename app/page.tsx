@@ -407,7 +407,9 @@ export default function Home() {
                 <Spinner color="default" label="Memuat kalender akademik..." />
               </div>
             ) : eventsData ? (
-              <Timeline events={eventsData.data} />
+              <div className="w-full">
+                <Timeline events={eventsData.data} />
+              </div>
             ) : (
               <p className="p-4 text-center text-gray-500">
                 Tidak ada data kalender ditemukan

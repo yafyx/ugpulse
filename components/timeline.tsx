@@ -176,8 +176,9 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
       // Calculate minimum needed height (lanes + header + some padding)
       const neededHeight = headerHeight + (maxLaneIndex + 1) * laneHeight + 20;
 
-      // Use a reasonable height based on content, with minimum and maximum constraints
-      const calculatedHeight = Math.max(Math.min(neededHeight, 500), 250);
+      // Use a reasonable height based on content, with minimum constraints
+      // Remove the maximum constraint to allow full display or scrolling
+      const calculatedHeight = Math.max(neededHeight, 250);
       setContentHeight(calculatedHeight);
     }
   }, [events, adjustedEvents]);
@@ -401,8 +402,9 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
   const laneHeight = 36;
   const headerHeight = 80;
   const eventAreaHeight = contentHeight - headerHeight;
-  const maxLanes = Math.floor(eventAreaHeight / laneHeight);
-  const visibleLanes = Math.min(maxLanes, maxLaneIndex + 1);
+
+  // Remove the limit on visible lanes to show all events
+  const visibleLanes = maxLaneIndex + 1;
 
   // Set up the wheel event listener on the document
   useEffect(() => {
@@ -442,9 +444,12 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
             </div>
           </div>
           <div
-            className="overflow-x-auto overflow-y-hidden"
+            className="overflow-x-auto overflow-y-auto"
             ref={scrollContainerRef}
-            style={{ height: `${contentHeight}px` }}
+            style={{
+              height: `${Math.min(contentHeight, 400)}px`,
+              maxHeight: "400px",
+            }}
           >
             <div className="relative flex min-w-max flex-col" ref={timelineRef}>
               <div className="relative flex min-w-max flex-col">

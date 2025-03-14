@@ -46,7 +46,9 @@ export default function TimelinePage() {
           Lihat timeline kegiatan akademik yang akan datang
         </p>
       </div>
-      <Timeline events={eventsData.data} />
+      <div className="mb-10 w-full">
+        <Timeline events={eventsData.data} />
+      </div>
     </div>
   );
 }
