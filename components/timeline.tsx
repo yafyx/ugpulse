@@ -83,6 +83,9 @@ const parseDate = (dateString: string, endDateString?: string) => {
   return parseISO(`${parsedYear}-${monthMap[month]}-${day.padStart(2, "0")}`);
 };
 
+// Scroll settings
+const SCROLL_SENSITIVITY = 2; // Higher values make horizontal scrolling more sensitive
+
 const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -95,8 +98,9 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
     position: string;
     secondsLeft: number;
   } | null>(null);
-  const [contentHeight, setContentHeight] = useState(300); // Default height that will be adjusted
+  const [contentHeight, setContentHeight] = useState(300); // Default height
   const [autoScrollComplete, setAutoScrollComplete] = useState(false);
+  const [isMouseOverTimeline, setIsMouseOverTimeline] = useState(false);
 
   // Process the events data
   const adjustedEvents = useMemo(() => {
@@ -273,6 +277,24 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
     }
   }, [currentTime, selectedEvent]);
 
+  // Mouse enter/leave handlers
+  const handleMouseEnter = () => {
+    setIsMouseOverTimeline(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsMouseOverTimeline(false);
+  };
+
+  // Handle wheel events to convert vertical scrolling to horizontal scrolling
+  // Only when mouse is over the timeline
+  const handleWheel = (e: React.WheelEvent) => {
+    if (scrollContainerRef.current && isMouseOverTimeline) {
+      e.preventDefault(); // Prevent the default vertical scroll only when mouse is over timeline
+      scrollContainerRef.current.scrollLeft += e.deltaY * SCROLL_SENSITIVITY;
+    }
+  };
+
   const getEventStatus = (event: Event) => {
     const start = parseDate(event.start);
     const end = parseDate(event.end);
@@ -382,10 +404,43 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
   const maxLanes = Math.floor(eventAreaHeight / laneHeight);
   const visibleLanes = Math.min(maxLanes, maxLaneIndex + 1);
 
+  // Set up the wheel event listener on the document
+  useEffect(() => {
+    // We need to handle wheel events at the document level to properly
+    // manage when to prevent default scrolling
+    const handleDocumentWheel = (e: WheelEvent) => {
+      if (!scrollContainerRef.current || !isMouseOverTimeline) return;
+
+      // Check if the mouse is over the timeline component
+      // If so, prevent the default scroll and handle horizontal scrolling
+      if (isMouseOverTimeline) {
+        e.preventDefault();
+        scrollContainerRef.current.scrollLeft += e.deltaY * SCROLL_SENSITIVITY;
+      }
+    };
+
+    // We need to use passive: false to be able to prevent default
+    document.addEventListener("wheel", handleDocumentWheel, { passive: false });
+
+    return () => {
+      document.removeEventListener("wheel", handleDocumentWheel);
+    };
+  }, [isMouseOverTimeline]);
+
   return (
-    <div className="timeline-container">
+    <div
+      className="timeline-container relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <Card className="overflow-hidden">
         <CardBody className="p-0">
+          <div className="flex items-center justify-between p-2">
+            <h3 className="text-lg font-semibold">Timeline</h3>
+            <div className="ml-auto text-xs text-gray-500 dark:text-gray-400">
+              Scroll vertically to navigate horizontally
+            </div>
+          </div>
           <div
             className="overflow-x-auto overflow-y-hidden"
             ref={scrollContainerRef}
@@ -459,7 +514,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     return (
                       <div
                         key={index}
-                        className={`${gradients[index % gradients.length]} absolute flex h-8 cursor-pointer items-center overflow-hidden rounded-full p-2 text-white transition-all duration-300 hover:shadow-lg hover:brightness-110`}
+                        className={`${gradients[index % gradients.length]} absolute flex h-8 cursor-pointer items-center overflow-visible rounded-full p-2 text-white transition-all duration-300 hover:z-20 hover:shadow-lg hover:brightness-110`}
                         style={{
                           width: `${width}px`,
                           left: `${left}px`,
@@ -481,7 +536,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                             </Chip>
                           </Tooltip>
                         )}
-                        <span className="sticky left-0 z-10 flex flex-col truncate text-ellipsis text-sm font-medium text-white drop-shadow-lg sm:text-base">
+                        <span className="sticky left-0 z-10 flex flex-col truncate text-ellipsis whitespace-nowrap text-sm font-medium text-white drop-shadow-lg sm:text-base">
                           {event.kegiatan}
                         </span>
                         {status.position === "end" && (
@@ -591,6 +646,21 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
             opacity: 0.8;
             box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
           }
+        }
+
+        /* Add scroll indicator */
+        .timeline-container::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 10px;
+          width: 24px;
+          height: 24px;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='rgba(255, 255, 255, 0.5)' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
+          background-size: contain;
+          background-repeat: no-repeat;
+          opacity: 0.5;
+          pointer-events: none;
         }
       `}</style>
     </div>
