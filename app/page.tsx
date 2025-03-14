@@ -169,14 +169,15 @@ export default function Home() {
 
   if (eventsError) {
     return (
-      <div className="flex min-h-screen w-full flex-col items-center justify-center p-4">
-        <Card className="max-w-md">
-          <CardBody>
+      <div className="flex min-h-[50vh] w-full flex-col items-center justify-center rounded-xl">
+        <Card className="max-w-md border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+          <CardBody className="p-6">
             <h1 className="mb-4 text-xl font-bold text-red-500">Error</h1>
-            <p>Failed to load calendar data. Please try again later.</p>
+            <p className="text-zinc-700 dark:text-zinc-300">
+              Failed to load calendar data. Please try again later.
+            </p>
             <Button
-              className="mt-4"
-              color="primary"
+              className="mt-4 bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
               onClick={() => window.location.reload()}
             >
               Refresh Page
@@ -188,84 +189,131 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col p-4">
-      <h1 className="relative z-20 bg-gradient-to-b from-neutral-200 to-neutral-500 bg-clip-text py-8 pt-0 text-4xl font-bold text-transparent sm:text-7xl">
-        Cari jadwal dan daftar mahasiswa baru
-      </h1>
+    <div className="flex w-full flex-col">
+      <div className="mx-auto max-w-4xl">
+        <h1 className="mb-6 text-4xl font-bold text-zinc-800 dark:text-zinc-100 sm:text-5xl md:text-6xl">
+          cari jadwal dan daftar <br className="hidden sm:block" />
+          <span className="inline-block text-zinc-600 dark:text-zinc-300">
+            mahasiswa baru
+          </span>
+        </h1>
 
-      <form onSubmit={handleSubmit} className="mb-4">
-        <Card className="p-6">
-          <div className="flex flex-col gap-4">
-            <Input
-              variant="faded"
-              className="font-semibold"
-              labelPlacement="outside"
-              type="text"
-              label="Masukkan yang ingin dicari"
-              placeholder="Contoh: 2IA14"
-              value={kelas}
-              onChange={handleKelasChange}
-              aria-label="Kelas atau nama pencarian"
-              isRequired
-            />
+        <form onSubmit={handleSubmit} className="mb-8">
+          <Card className="border border-zinc-200/20 bg-white/80 p-6 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+            <div className="flex flex-col gap-5">
+              <Input
+                variant="bordered"
+                className="font-semibold"
+                labelPlacement="outside"
+                type="text"
+                label="Masukkan yang ingin dicari"
+                placeholder="Contoh: 2IA14"
+                value={kelas}
+                onChange={handleKelasChange}
+                aria-label="Kelas atau nama pencarian"
+                size="lg"
+                classNames={{
+                  label:
+                    "text-zinc-600 font-medium dark:text-zinc-400 text-base",
+                  input: [
+                    "bg-transparent",
+                    "text-zinc-800 dark:text-zinc-200",
+                    "placeholder:text-zinc-500/60",
+                  ],
+                  inputWrapper: [
+                    "bg-white/40 dark:bg-zinc-800/40",
+                    "backdrop-blur-md",
+                    "border-zinc-200/30 dark:border-zinc-700/40",
+                    "hover:border-zinc-400/50 dark:hover:border-zinc-500/30",
+                    "focus-within:!ring-2 focus-within:ring-zinc-500/30",
+                    "group-data-[focused=true]:bg-white/60 dark:group-data-[focused=true]:bg-zinc-800/60",
+                  ],
+                }}
+                isRequired
+              />
 
-            <hr
-              className="h-divider w-full shrink-0 border-none bg-divider"
-              role="separator"
-            />
+              <div
+                className="h-px w-full bg-gradient-to-r from-transparent via-zinc-400/20 to-transparent"
+                role="separator"
+              />
 
-            <div className="flex h-auto w-full items-center">
-              <small className="text-default-500">
-                Tip: Kamu juga bisa mencari berdasarkan nama dan npm untuk
-                mahasiswa dan dosen untuk jadwal
-              </small>
+              <div className="flex h-auto w-full items-center">
+                <small className="rounded-md bg-zinc-200/50 p-2 text-sm italic text-zinc-600 backdrop-blur-sm dark:bg-zinc-800/50 dark:text-zinc-400">
+                  Tip: Kamu juga bisa mencari berdasarkan nama dan npm untuk
+                  mahasiswa dan dosen untuk jadwal
+                </small>
+              </div>
+
+              <CheckboxGroup
+                orientation="horizontal"
+                label="Pilih opsi yang ingin ditampilkan"
+                value={selectedOptions}
+                onValueChange={handleOptionsChange}
+                aria-label="Opsi pencarian"
+                classNames={{
+                  label:
+                    "text-zinc-600 font-medium dark:text-zinc-400 text-base",
+                  wrapper: "gap-4",
+                }}
+                isRequired
+              >
+                <Checkbox
+                  value="jadwal"
+                  classNames={{
+                    label: "text-zinc-700 dark:text-zinc-300",
+                  }}
+                  size="lg"
+                >
+                  Jadwal Kelas
+                </Checkbox>
+                <Checkbox
+                  value="kelasBaru"
+                  isDisabled={selectedOptions.includes("mahasiswaBaru")}
+                  classNames={{
+                    label: "text-zinc-700 dark:text-zinc-300",
+                  }}
+                  size="lg"
+                >
+                  Kelas Baru
+                </Checkbox>
+                <Checkbox
+                  value="mahasiswaBaru"
+                  isDisabled={selectedOptions.includes("kelasBaru")}
+                  classNames={{
+                    label: "text-zinc-700 dark:text-zinc-300",
+                  }}
+                  size="lg"
+                >
+                  Mahasiswa Baru
+                </Checkbox>
+              </CheckboxGroup>
+
+              <Button
+                type="submit"
+                className="bg-zinc-800 font-medium text-white shadow-lg hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
+                isLoading={isLoading}
+                isDisabled={!kelas.trim() || selectedOptions.length === 0}
+                size="lg"
+              >
+                {isLoading ? "Memuat Data..." : "Tampilkan Data"}
+              </Button>
             </div>
-
-            <CheckboxGroup
-              orientation="horizontal"
-              label="Pilih opsi yang ingin ditampilkan"
-              value={selectedOptions}
-              onValueChange={handleOptionsChange}
-              aria-label="Opsi pencarian"
-              isRequired
-            >
-              <Checkbox value="jadwal">Jadwal Kelas</Checkbox>
-              <Checkbox
-                value="kelasBaru"
-                isDisabled={selectedOptions.includes("mahasiswaBaru")}
-              >
-                Kelas Baru
-              </Checkbox>
-              <Checkbox
-                value="mahasiswaBaru"
-                isDisabled={selectedOptions.includes("kelasBaru")}
-              >
-                Mahasiswa Baru
-              </Checkbox>
-            </CheckboxGroup>
-
-            <Button
-              type="submit"
-              className="bg-black text-white dark:bg-white dark:text-black"
-              isLoading={isLoading}
-              isDisabled={!kelas.trim() || selectedOptions.length === 0}
-            >
-              {isLoading ? "Memuat Data..." : "Tampilkan Data"}
-            </Button>
-          </div>
-        </Card>
-      </form>
+          </Card>
+        </form>
+      </div>
 
       {showKelasData && (
-        <section aria-label="Hasil Pencarian" className="mb-6">
-          <div className="flex flex-col gap-4 md:flex-row md:gap-x-4">
+        <section aria-label="Hasil Pencarian" className="mb-10">
+          <div className="flex flex-col gap-6 md:flex-row md:gap-x-6">
             {selectedOptions.includes("jadwal") && (
               <div
                 className={`w-full ${selectedOptionsCount > 1 ? "md:w-1/2" : ""} transition-all duration-300`}
               >
-                <Card className="h-full">
-                  <CardHeader className="border-b border-divider px-6 py-4">
-                    <h2 className="text-xl font-semibold">Jadwal Kelas</h2>
+                <Card className="h-full border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+                  <CardHeader className="border-b border-zinc-200/30 px-6 py-4 dark:border-zinc-700/30">
+                    <h2 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
+                      Jadwal Kelas
+                    </h2>
                   </CardHeader>
                   <CardBody>
                     {jadwalError ? (
@@ -275,7 +323,7 @@ export default function Home() {
                         </p>
                         <Button
                           size="sm"
-                          className="mt-2"
+                          className="mt-2 bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
                           onClick={() => window.location.reload()}
                         >
                           Coba Lagi
@@ -294,7 +342,7 @@ export default function Home() {
                         kelas={kelas}
                       />
                     ) : (
-                      <p className="p-4 text-center text-gray-500">
+                      <p className="p-4 text-center text-zinc-500 dark:text-zinc-400">
                         Tidak ada data jadwal ditemukan
                       </p>
                     )}
@@ -307,9 +355,11 @@ export default function Home() {
               <div
                 className={`w-full ${selectedOptionsCount > 1 ? "md:w-1/2" : ""} transition-all duration-300`}
               >
-                <Card className="h-full">
-                  <CardHeader className="border-b border-divider px-6 py-4">
-                    <h2 className="text-xl font-semibold">Kelas Baru</h2>
+                <Card className="h-full border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+                  <CardHeader className="border-b border-zinc-200/30 px-6 py-4 dark:border-zinc-700/30">
+                    <h2 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
+                      Kelas Baru
+                    </h2>
                   </CardHeader>
                   <CardBody>
                     {kelasBaruError ? (
@@ -319,7 +369,7 @@ export default function Home() {
                         </p>
                         <Button
                           size="sm"
-                          className="mt-2"
+                          className="mt-2 bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
                           onClick={() => window.location.reload()}
                         >
                           Coba Lagi
@@ -338,7 +388,7 @@ export default function Home() {
                         type="kelasBaru"
                       />
                     ) : (
-                      <p className="p-4 text-center text-gray-500">
+                      <p className="p-4 text-center text-zinc-500 dark:text-zinc-400">
                         Tidak ada data kelas baru ditemukan
                       </p>
                     )}
@@ -351,9 +401,11 @@ export default function Home() {
               <div
                 className={`w-full ${selectedOptionsCount > 1 ? "md:w-1/2" : ""} transition-all duration-300`}
               >
-                <Card className="h-full">
-                  <CardHeader className="border-b border-divider px-6 py-4">
-                    <h2 className="text-xl font-semibold">Mahasiswa Baru</h2>
+                <Card className="h-full border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+                  <CardHeader className="border-b border-zinc-200/30 px-6 py-4 dark:border-zinc-700/30">
+                    <h2 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
+                      Mahasiswa Baru
+                    </h2>
                   </CardHeader>
                   <CardBody>
                     {mahasiswaBaruError ? (
@@ -363,7 +415,7 @@ export default function Home() {
                         </p>
                         <Button
                           size="sm"
-                          className="mt-2"
+                          className="mt-2 bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
                           onClick={() => window.location.reload()}
                         >
                           Coba Lagi
@@ -382,7 +434,7 @@ export default function Home() {
                         type="mahasiswaBaru"
                       />
                     ) : (
-                      <p className="p-4 text-center text-gray-500">
+                      <p className="p-4 text-center text-zinc-500 dark:text-zinc-400">
                         Tidak ada data mahasiswa baru ditemukan
                       </p>
                     )}
@@ -395,9 +447,9 @@ export default function Home() {
       )}
 
       <section aria-label="Kalender Akademik" className="mb-10">
-        <Card shadow="sm">
-          <CardHeader className="border-b border-divider bg-white/60 px-6 py-4 dark:bg-zinc-800/50">
-            <h2 className="text-xl font-semibold">
+        <Card className="border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+          <CardHeader className="border-b border-zinc-200/30 px-6 py-4 dark:border-zinc-700/30">
+            <h2 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
               Timeline Kalender Akademik
             </h2>
           </CardHeader>
@@ -411,7 +463,7 @@ export default function Home() {
                 <Timeline events={eventsData.data} />
               </div>
             ) : (
-              <p className="p-4 text-center text-gray-500">
+              <p className="p-4 text-center text-zinc-500 dark:text-zinc-400">
                 Tidak ada data kalender ditemukan
               </p>
             )}

@@ -38,12 +38,12 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { media: "(prefers-color-scheme: light)", color: "#f3f4f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#18181b" },
   ],
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 2,
 };
 
 export default function RootLayout({
@@ -55,22 +55,54 @@ export default function RootLayout({
     <html suppressHydrationWarning lang="en" className={fontSans.variable}>
       <body
         className={clsx(
-          "bg-gradient-to-br from-[#f0f0f0] to-[#e0e0e0] font-sans antialiased dark:from-[#000000] dark:to-[#000000]",
+          "bg-zinc-100 font-sans text-zinc-900 antialiased dark:bg-zinc-900 dark:text-zinc-100",
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex min-h-screen flex-col">
+            {/* Decorative background elements */}
+            <div className="fixed inset-0 -z-10 overflow-hidden">
+              <div className="absolute -left-1/4 top-0 h-[600px] w-[600px] rounded-full bg-zinc-200/50 blur-3xl dark:bg-zinc-800/30"></div>
+              <div className="absolute -right-1/4 bottom-0 h-[600px] w-[600px] rounded-full bg-zinc-300/30 blur-3xl dark:bg-zinc-700/20"></div>
+              <div className="absolute left-1/2 top-1/2 h-[900px] w-[900px] -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-zinc-200/20 blur-3xl dark:bg-zinc-800/10"></div>
+            </div>
+
+            {/* Top border accent */}
+            <div className="fixed left-0 right-0 top-0 z-30 h-1 bg-gradient-to-r from-transparent via-zinc-400/20 to-transparent"></div>
+
             <Navbar />
-            <main className="container mx-auto max-w-full flex-grow pt-8 sm:px-4">
+            <main className="container mx-auto flex-grow px-4 pt-8 sm:px-6 lg:px-8">
               {children}
             </main>
             <footer
-              className="flex w-full items-center justify-center py-3"
+              className="mt-12 w-full border-t border-zinc-200/20 bg-white/60 py-6 backdrop-blur-md dark:border-zinc-700/30 dark:bg-zinc-900/60"
               aria-label="Footer"
             >
-              <p className="text-sm text-gray-500">
-                © {new Date().getFullYear()} UG Connect
-              </p>
+              <div className="container mx-auto flex flex-col items-center justify-between space-y-3 px-4 sm:flex-row sm:space-y-0 sm:px-6 lg:px-8">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  © {new Date().getFullYear()} UG Connect
+                </p>
+                <div className="flex items-center space-x-4">
+                  <a
+                    href="#"
+                    className="text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  >
+                    Terms
+                  </a>
+                  <a
+                    href="#"
+                    className="text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  >
+                    Privacy
+                  </a>
+                  <a
+                    href="#"
+                    className="text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  >
+                    Contact
+                  </a>
+                </div>
+              </div>
             </footer>
           </div>
         </Providers>

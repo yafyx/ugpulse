@@ -10,6 +10,7 @@ import {
   ModalFooter,
   useDisclosure,
   Tooltip,
+  Button,
 } from "@nextui-org/react";
 import {
   parseISO,
@@ -33,28 +34,23 @@ interface Event {
   end: string;
 }
 
-const gradients = [
-  "bg-gradient-to-b from-slate-700 to-slate-800",
-  "bg-gradient-to-b from-zinc-700 to-zinc-800",
-  "bg-gradient-to-b from-neutral-700 to-neutral-800",
-  "bg-gradient-to-b from-stone-700 to-stone-800",
-  "bg-gradient-to-b from-red-800 to-red-900",
-  "bg-gradient-to-b from-orange-800 to-orange-900",
-  "bg-gradient-to-b from-amber-800 to-amber-900",
-  "bg-gradient-to-b from-yellow-800 to-yellow-900",
-  "bg-gradient-to-b from-lime-800 to-lime-900",
-  "bg-gradient-to-b from-green-800 to-green-900",
-  "bg-gradient-to-b from-emerald-800 to-emerald-900",
-  "bg-gradient-to-b from-teal-800 to-teal-900",
-  "bg-gradient-to-b from-cyan-800 to-cyan-900",
-  "bg-gradient-to-b from-sky-800 to-sky-900",
-  "bg-gradient-to-b from-blue-800 to-blue-900",
-  "bg-gradient-to-b from-indigo-800 to-indigo-900",
-  "bg-gradient-to-b from-violet-800 to-violet-900",
-  "bg-gradient-to-b from-purple-800 to-purple-900",
-  "bg-gradient-to-b from-fuchsia-800 to-fuchsia-900",
-  "bg-gradient-to-b from-pink-800 to-pink-900",
-  "bg-gradient-to-b from-rose-800 to-rose-900",
+// Monochromatic color scheme for events
+const eventColors = [
+  "bg-zinc-800 dark:bg-zinc-800",
+  "bg-zinc-700 dark:bg-zinc-700",
+  "bg-zinc-900 dark:bg-zinc-900",
+  "bg-slate-800 dark:bg-slate-800",
+  "bg-slate-700 dark:bg-slate-700",
+  "bg-slate-900 dark:bg-slate-900",
+  "bg-stone-800 dark:bg-stone-800",
+  "bg-stone-700 dark:bg-stone-700",
+  "bg-stone-900 dark:bg-stone-900",
+  "bg-gray-800 dark:bg-gray-800",
+  "bg-gray-700 dark:bg-gray-700",
+  "bg-gray-900 dark:bg-gray-900",
+  "bg-neutral-800 dark:bg-neutral-800",
+  "bg-neutral-700 dark:bg-neutral-700",
+  "bg-neutral-900 dark:bg-neutral-900",
 ];
 
 const parseDate = (dateString: string, endDateString?: string) => {
@@ -101,6 +97,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
   const [contentHeight, setContentHeight] = useState(300); // Default height
   const [autoScrollComplete, setAutoScrollComplete] = useState(false);
   const [isMouseOverTimeline, setIsMouseOverTimeline] = useState(false);
+  const [isHoveringMarker, setIsHoveringMarker] = useState(false);
 
   // Process the events data
   const adjustedEvents = useMemo(() => {
@@ -435,16 +432,61 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-900/60">
         <CardBody className="p-0">
-          <div className="flex items-center justify-between p-2">
-            <h3 className="text-lg font-semibold">Timeline</h3>
-            <div className="ml-auto text-xs text-gray-500 dark:text-gray-400">
-              Scroll vertically to navigate horizontally
+          <div className="flex items-center justify-between border-b border-zinc-200/30 p-4 dark:border-zinc-700/30">
+            <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
+              Timeline Akademik
+            </h3>
+            <div className="ml-auto flex items-center gap-2">
+              <div className="hidden rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-xs text-zinc-500 backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400 md:block">
+                Scroll untuk melihat lebih banyak
+              </div>
+              <Button
+                size="sm"
+                variant="flat"
+                className="bg-zinc-100/20 text-zinc-800 backdrop-blur-sm hover:bg-zinc-200/30 dark:bg-zinc-800/30 dark:text-zinc-200 dark:hover:bg-zinc-700/40"
+                onClick={() => {
+                  // Scroll to current date
+                  if (scrollContainerRef.current) {
+                    const currentDate = new Date();
+                    const diffDays = differenceInDays(
+                      currentDate,
+                      displayStartDate,
+                    );
+                    const scrollPosition = diffDays * 40;
+                    const containerWidth =
+                      scrollContainerRef.current.clientWidth;
+                    const targetScrollPosition = Math.max(
+                      0,
+                      scrollPosition - containerWidth * 0.4,
+                    );
+
+                    scrollContainerRef.current.scrollTo({
+                      left: targetScrollPosition,
+                      behavior: "smooth",
+                    });
+
+                    // Highlight current time marker
+                    const currentTimeMarker =
+                      timelineRef.current?.querySelector(
+                        ".current-time-marker",
+                      );
+                    if (currentTimeMarker instanceof HTMLElement) {
+                      currentTimeMarker.classList.add("pulse-animation");
+                      setTimeout(() => {
+                        currentTimeMarker.classList.remove("pulse-animation");
+                      }, 2000);
+                    }
+                  }
+                }}
+              >
+                Hari Ini
+              </Button>
             </div>
           </div>
           <div
-            className="overflow-x-auto overflow-y-auto"
+            className="scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-700 scrollbar-track-transparent overflow-x-auto"
             ref={scrollContainerRef}
             style={{
               height: `${Math.min(contentHeight, 400)}px`,
@@ -453,17 +495,18 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
           >
             <div className="relative flex min-w-max flex-col" ref={timelineRef}>
               <div className="relative flex min-w-max flex-col">
+                {/* Grid background with subtle glass effect */}
                 <div className="pointer-events-none absolute bottom-0 left-[-20px] right-0 top-28">
-                  <div className="h-full w-full bg-[linear-gradient(to_right,transparent_39px,#a1a1aa1a_39px,#a1a1aa1a_40px,transparent_40px)] bg-[length:40px_100%] bg-repeat-x opacity-50"></div>
+                  <div className="h-full w-full bg-[linear-gradient(to_right,transparent_39px,rgba(161,161,170,0.05)_39px,rgba(161,161,170,0.05)_40px,transparent_40px)] bg-[length:40px_100%] bg-repeat-x"></div>
                 </div>
-                <div className="flex items-center p-2 dark:text-white">
+                <div className="sticky top-0 z-10 flex items-center bg-white/90 p-2 shadow-sm backdrop-blur-md dark:bg-zinc-900/90 dark:text-white">
                   {Object.keys(months).map((monthKey) => (
                     <div
                       key={monthKey}
-                      className="sticky top-0 z-10 flex flex-col items-start"
+                      className="flex flex-col items-start"
                       style={{ width: `${months[monthKey].length * 40}px` }}
                     >
-                      <h3 className="p-2 text-2xl font-bold">
+                      <h3 className="p-2 text-2xl font-bold text-zinc-800 dark:text-zinc-100">
                         {format(months[monthKey][0], "MMMM yyyy", {
                           locale: id,
                         })}
@@ -472,7 +515,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                         {months[monthKey].map((date, index) => (
                           <div
                             key={`${monthKey}-${index}`}
-                            className="w-10 text-sm text-black/70 dark:text-white/70"
+                            className="w-10 text-sm font-medium text-zinc-500 dark:text-zinc-400"
                           >
                             {weekdays[date.getDay()]}
                           </div>
@@ -488,16 +531,24 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                       className="flex flex-wrap"
                       style={{ width: `${dates.length * 40}px` }}
                     >
-                      {dates.map((date, dateIndex) => (
-                        <div
-                          key={dateIndex}
-                          className="flex w-10 flex-col items-center"
-                        >
-                          <div className="flex items-center justify-center font-semibold">
-                            {format(date, "d")}
+                      {dates.map((date, dateIndex) => {
+                        const isToday = isSameDay(date, new Date());
+                        return (
+                          <div
+                            key={dateIndex}
+                            className={`flex w-10 flex-col items-center ${isToday ? "relative" : ""}`}
+                          >
+                            <div
+                              className={`flex items-center justify-center font-semibold ${isToday ? "h-6 w-6 rounded-full bg-zinc-800 text-white shadow-md dark:bg-zinc-200 dark:text-black" : "text-zinc-700 dark:text-zinc-300"}`}
+                            >
+                              {format(date, "d")}
+                            </div>
+                            {isToday && (
+                              <div className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 transform rounded-full bg-zinc-500 dark:bg-zinc-400"></div>
+                            )}
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   ))}
                 </div>
@@ -514,16 +565,26 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     const left = differenceInDays(start, displayStartDate) * 40;
                     const status = getEventStatus(event);
 
+                    // Skip if the event is outside visible lanes
                     if (event.laneIndex >= visibleLanes) return null;
+
+                    // Calculate if this event is active (happening now)
+                    const isActive = isWithinInterval(new Date(), {
+                      start,
+                      end,
+                    });
 
                     return (
                       <div
                         key={index}
-                        className={`${gradients[index % gradients.length]} absolute flex h-8 cursor-pointer items-center overflow-visible rounded-full p-2 text-white transition-all duration-300 hover:z-20 hover:shadow-lg hover:brightness-110`}
+                        className={`${eventColors[index % eventColors.length]} absolute flex h-8 cursor-pointer items-center overflow-visible rounded-full p-2 text-white transition-all duration-300 hover:z-20 hover:shadow-xl ${isActive ? "border-2 border-white/80" : "border border-white/30"} backdrop-blur-md backdrop-saturate-150 hover:scale-[1.02]`}
                         style={{
                           width: `${width}px`,
                           left: `${left}px`,
                           top: `${event.laneIndex * laneHeight}px`,
+                          boxShadow: isActive
+                            ? "0 0 15px rgba(0, 0, 0, 0.3)"
+                            : "none",
                         }}
                         onClick={() => handleEventClick(event)}
                       >
@@ -531,11 +592,15 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                           <Tooltip
                             placement="right"
                             content={`${status.full} ${formatTimeLeft(status.secondsLeft)}`}
+                            classNames={{
+                              base: "py-2 px-4 shadow-xl rounded-lg border border-zinc-800/20 backdrop-blur-md bg-zinc-900/90 dark:bg-zinc-800/90",
+                              content: "text-white",
+                            }}
                           >
                             <Chip
                               size="sm"
                               variant="solid"
-                              className="mr-1 bg-white/10 text-white"
+                              className="mr-1 border border-white/10 bg-black/20 text-white backdrop-blur-md"
                             >
                               {status.short}
                             </Chip>
@@ -547,11 +612,15 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                         {status.position === "end" && (
                           <Tooltip
                             content={`${status.full} ${formatTimeLeft(status.secondsLeft)}`}
+                            classNames={{
+                              base: "py-2 px-4 shadow-xl rounded-lg border border-zinc-800/20 backdrop-blur-md bg-zinc-900/90 dark:bg-zinc-800/90",
+                              content: "text-white",
+                            }}
                           >
                             <Chip
                               size="sm"
                               variant="solid"
-                              className="ml-2 bg-white/10 text-white"
+                              className="ml-2 border border-white/10 bg-black/20 text-white backdrop-blur-md"
                             >
                               {status.short}
                             </Chip>
@@ -560,13 +629,21 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                       </div>
                     );
                   })}
+
+                  {/* Current time marker with more elegant design */}
                   <div
-                    className="current-time-marker absolute bottom-0 top-[-40px] z-20 w-[2px] cursor-default bg-black transition-opacity hover:opacity-10 dark:bg-white"
-                    style={{ left: `${currentTimePosition}px` }}
+                    className="current-time-marker absolute bottom-0 top-[-40px] z-20 w-[2px] cursor-default bg-zinc-800 transition-all duration-300 dark:bg-zinc-300"
+                    style={{
+                      left: `${currentTimePosition}px`,
+                      opacity: isHoveringMarker ? 0.5 : 1,
+                    }}
+                    onMouseEnter={() => setIsHoveringMarker(true)}
+                    onMouseLeave={() => setIsHoveringMarker(false)}
                   >
-                    <div className="absolute left-[-30px] top-[-20px] rounded-full bg-black px-2 py-1 text-xs text-white shadow-lg dark:bg-white dark:text-black">
+                    <div className="absolute left-[-40px] top-[-30px] rounded-xl border border-zinc-300/30 bg-zinc-800 px-3 py-1.5 text-xs text-white shadow-md backdrop-blur-md dark:border-zinc-600/30 dark:bg-zinc-800">
                       {format(currentTime, "HH:mm:ss")}
                     </div>
+                    <div className="absolute left-[-4px] top-[-10px] h-4 w-4 rounded-full border-2 border-zinc-800 bg-white shadow-md dark:border-zinc-300 dark:bg-zinc-900"></div>
                   </div>
                 </div>
               </div>
@@ -575,25 +652,35 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
         </CardBody>
       </Card>
 
+      {/* Refined modal with monochromatic design */}
       <Modal
         placement="center"
-        hideCloseButton={true}
+        hideCloseButton={false}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
+        classNames={{
+          base: "bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200/30 dark:border-zinc-700/30 shadow-xl",
+          header: "border-b border-zinc-200/30 dark:border-zinc-700/30",
+          footer: "border-t border-zinc-200/30 dark:border-zinc-700/30",
+        }}
         motionProps={{
           variants: {
             enter: {
               y: 0,
               opacity: 1,
+              scale: 1,
               transition: {
-                duration: 0.1,
+                duration: 0.2,
+                ease: "easeOut",
               },
             },
             exit: {
               y: 5,
               opacity: 0,
+              scale: 0.98,
               transition: {
-                duration: 0.1,
+                duration: 0.15,
+                ease: "easeIn",
               },
             },
           },
@@ -602,19 +689,19 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
+              <ModalHeader className="flex flex-col gap-1 text-zinc-800 dark:text-zinc-100">
                 <h2 className="text-lg font-semibold leading-none tracking-tight">
                   {selectedEvent?.kegiatan}
                 </h2>
               </ModalHeader>
               <ModalBody>
-                <p className="text-xs text-foreground-600 sm:text-start sm:text-sm">
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 sm:text-start">
                   {selectedEvent?.tanggal}
                 </p>
                 <Link
                   showAnchorIcon
                   href="https://baak.gunadarma.ac.id/"
-                  className="truncate text-center text-xs text-foreground-500 hover:text-foreground sm:text-start"
+                  className="truncate text-center text-xs text-zinc-500 transition duration-200 hover:text-zinc-800 dark:hover:text-zinc-200 sm:text-start"
                 >
                   https://baak.gunadarma.ac.id/
                 </Link>
@@ -622,11 +709,19 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
               <ModalFooter className="items-center justify-between">
                 <Chip
                   variant="solid"
-                  className="bg-black text-white dark:bg-white dark:text-black"
+                  className="border border-zinc-200/20 bg-zinc-800 text-white shadow-sm dark:border-zinc-700/30"
                 >
                   {selectedEventStatus &&
                     `${selectedEventStatus.full} ${formatTimeLeft(selectedEventStatus.secondsLeft)}`}
                 </Chip>
+                <Button
+                  size="sm"
+                  variant="light"
+                  onPress={onClose}
+                  className="bg-zinc-100/20 text-zinc-800 backdrop-blur-sm hover:bg-zinc-200/30 dark:bg-zinc-800/30 dark:text-zinc-200 dark:hover:bg-zinc-700/40"
+                >
+                  Tutup
+                </Button>
               </ModalFooter>
             </>
           )}
@@ -641,27 +736,45 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
         @keyframes pulse {
           0% {
             opacity: 0.3;
-            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+            box-shadow: 0 0 0 0 rgba(24, 24, 27, 0.7);
           }
           50% {
             opacity: 1;
-            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+            box-shadow: 0 0 0 15px rgba(24, 24, 27, 0);
           }
           100% {
             opacity: 0.8;
-            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+            box-shadow: 0 0 0 0 rgba(24, 24, 27, 0);
           }
+        }
+
+        /* Scrollbar styling for webkit browsers */
+        .scrollbar-thin::-webkit-scrollbar {
+          height: 6px;
+        }
+
+        .scrollbar-thumb-zinc-300::-webkit-scrollbar-thumb {
+          background-color: rgba(212, 212, 216, 0.5);
+          border-radius: 9999px;
+        }
+
+        .dark .scrollbar-thumb-zinc-700::-webkit-scrollbar-thumb {
+          background-color: rgba(63, 63, 70, 0.5);
+        }
+
+        .scrollbar-track-transparent::-webkit-scrollbar-track {
+          background-color: transparent;
         }
 
         /* Add scroll indicator */
         .timeline-container::after {
           content: "";
           position: absolute;
-          top: 0;
+          top: 10px;
           right: 10px;
           width: 24px;
           height: 24px;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='rgba(255, 255, 255, 0.5)' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='rgba(161, 161, 170, 0.7)' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
           background-size: contain;
           background-repeat: no-repeat;
           opacity: 0.5;
