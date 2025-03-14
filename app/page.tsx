@@ -37,6 +37,7 @@ interface Jadwal {
 interface JadwalHari {
   [key: string]: Jadwal[] | null;
 }
+
 interface MahasiswaBaru {
   no_pend: string;
   nama: string;
@@ -44,6 +45,7 @@ interface MahasiswaBaru {
   kelas: string;
   keterangan: string;
 }
+
 interface KelasBaru {
   npm: string;
   nama: string;
@@ -51,7 +53,24 @@ interface KelasBaru {
   kelas_baru: string;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const API_BASE_URL = "https://baak-api.vercel.app";
+const ENDPOINTS = {
+  kalender: `${API_BASE_URL}/kalender`,
+  jadwal: (kelas: string) => `${API_BASE_URL}/jadwal/${kelas}`,
+  kelasBaru: (kelas: string) => `${API_BASE_URL}/kelasbaru/${kelas}`,
+  mahasiswaBaru: (kelas: string) => `${API_BASE_URL}/mahasiswabaru/${kelas}`,
+};
+
+const fetcher = async (url: string) => {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    const error = new Error("An error occurred while fetching the data.");
+    throw error;
+  }
+
+  return response.json();
+};
 
 export default function Home() {
   const [kelas, setKelas] = useState<string>("");
@@ -63,30 +82,48 @@ export default function Home() {
     [selectedOptions],
   );
 
-  const { data: eventsData, error: eventsError } = useSWR<Kalender>(
-    "https://baak-api.vercel.app/kalender",
-    fetcher,
-  );
+  const {
+    data: eventsData,
+    error: eventsError,
+    isLoading: isEventsLoading,
+  } = useSWR<Kalender>(ENDPOINTS.kalender, fetcher, {
+    revalidateOnFocus: false,
+  });
 
-  const { data: jadwalData, error: jadwalError } = useSWR(
-    showKelasData && selectedOptions.includes("jadwal")
-      ? `https://baak-api.vercel.app/jadwal/${kelas}`
+  const {
+    data: jadwalData,
+    error: jadwalError,
+    isLoading: isJadwalLoading,
+  } = useSWR(
+    showKelasData && selectedOptions.includes("jadwal") && kelas
+      ? ENDPOINTS.jadwal(kelas)
       : null,
     fetcher,
+    { revalidateOnFocus: false },
   );
 
-  const { data: kelasBaruData, error: kelasBaruError } = useSWR(
-    showKelasData && selectedOptions.includes("kelasBaru")
-      ? `https://baak-api.vercel.app/kelasbaru/${kelas}`
+  const {
+    data: kelasBaruData,
+    error: kelasBaruError,
+    isLoading: isKelasBaruLoading,
+  } = useSWR(
+    showKelasData && selectedOptions.includes("kelasBaru") && kelas
+      ? ENDPOINTS.kelasBaru(kelas)
       : null,
     fetcher,
+    { revalidateOnFocus: false },
   );
 
-  const { data: mahasiswaBaruData, error: mahasiswaBaruError } = useSWR(
-    showKelasData && selectedOptions.includes("mahasiswaBaru")
-      ? `https://baak-api.vercel.app/mahasiswabaru/${kelas}`
+  const {
+    data: mahasiswaBaruData,
+    error: mahasiswaBaruError,
+    isLoading: isMahasiswaBaruLoading,
+  } = useSWR(
+    showKelasData && selectedOptions.includes("mahasiswaBaru") && kelas
+      ? ENDPOINTS.mahasiswaBaru(kelas)
       : null,
     fetcher,
+    { revalidateOnFocus: false },
   );
 
   const handleKelasChange = useCallback(
@@ -96,25 +133,66 @@ export default function Home() {
     [],
   );
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setShowKelasData(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
-  }, []);
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!kelas.trim() || selectedOptions.length === 0) {
+        return;
+      }
 
-  const isTimelineLoading = !eventsData && !eventsError;
+      setIsLoading(true);
+      setShowKelasData(true);
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsLoading(false);
+    },
+    [kelas, selectedOptions],
+  );
+
+  const handleOptionsChange = useCallback(
+    (values: string[]) => {
+      if (values.includes("kelasBaru") && values.includes("mahasiswaBaru")) {
+        const newOption = values.includes("kelasBaru")
+          ? "mahasiswaBaru"
+          : "kelasBaru";
+        const filteredValues = values.filter(
+          (v) =>
+            v !== (newOption === "kelasBaru" ? "mahasiswaBaru" : "kelasBaru"),
+        );
+        setSelectedOptions(filteredValues);
+      } else {
+        setSelectedOptions(values);
+      }
+    },
+    [selectedOptions],
+  );
 
   if (eventsError) {
-    return <div>Error: Failed to load data</div>;
+    return (
+      <div className="flex min-h-screen w-full flex-col items-center justify-center p-4">
+        <Card className="max-w-md">
+          <CardBody>
+            <h1 className="mb-4 text-xl font-bold text-red-500">Error</h1>
+            <p>Failed to load calendar data. Please try again later.</p>
+            <Button
+              className="mt-4"
+              color="primary"
+              onClick={() => window.location.reload()}
+            >
+              Refresh Page
+            </Button>
+          </CardBody>
+        </Card>
+      </div>
+    );
   }
 
   return (
     <div className="flex min-h-screen w-full flex-col p-4">
-      <p className="relative z-20 bg-gradient-to-b from-neutral-200 to-neutral-500 bg-clip-text py-8 pt-0 text-4xl font-bold text-transparent sm:text-7xl">
-        cari jadwal dan daftar mahasiswa baru
-      </p>
+      <h1 className="relative z-20 bg-gradient-to-b from-neutral-200 to-neutral-500 bg-clip-text py-8 pt-0 text-4xl font-bold text-transparent sm:text-7xl">
+        Cari jadwal dan daftar mahasiswa baru
+      </h1>
+
       <form onSubmit={handleSubmit} className="mb-4">
         <Card className="p-6">
           <div className="flex flex-col gap-4">
@@ -127,22 +205,29 @@ export default function Home() {
               placeholder="Contoh: 2IA14"
               value={kelas}
               onChange={handleKelasChange}
+              aria-label="Kelas atau nama pencarian"
+              isRequired
             />
+
             <hr
               className="h-divider w-full shrink-0 border-none bg-divider"
               role="separator"
-            ></hr>
+            />
+
             <div className="flex h-auto w-full items-center">
               <small className="text-default-500">
                 Tip: Kamu juga bisa mencari berdasarkan nama dan npm untuk
                 mahasiswa dan dosen untuk jadwal
               </small>
             </div>
+
             <CheckboxGroup
               orientation="horizontal"
               label="Pilih opsi yang ingin ditampilkan"
               value={selectedOptions}
-              onValueChange={setSelectedOptions}
+              onValueChange={handleOptionsChange}
+              aria-label="Opsi pencarian"
+              isRequired
             >
               <Checkbox value="jadwal">Jadwal Kelas</Checkbox>
               <Checkbox
@@ -158,10 +243,12 @@ export default function Home() {
                 Mahasiswa Baru
               </Checkbox>
             </CheckboxGroup>
+
             <Button
               type="submit"
               className="bg-black text-white dark:bg-white dark:text-black"
               isLoading={isLoading}
+              isDisabled={!kelas.trim() || selectedOptions.length === 0}
             >
               {isLoading ? "Memuat Data..." : "Tampilkan Data"}
             </Button>
@@ -170,100 +257,165 @@ export default function Home() {
       </form>
 
       {showKelasData && (
-        <div className="flex flex-col gap-x-4 md:flex-row">
-          {selectedOptions.includes("jadwal") && (
-            <div
-              className={`w-full ${selectedOptionsCount > 1 ? "md:w-1/2" : ""} transition-all duration-300`}
-            >
-              {jadwalError ? (
-                <Card>
+        <section aria-label="Hasil Pencarian" className="mb-6">
+          <div className="flex flex-col gap-4 md:flex-row md:gap-x-4">
+            {selectedOptions.includes("jadwal") && (
+              <div
+                className={`w-full ${selectedOptionsCount > 1 ? "md:w-1/2" : ""} transition-all duration-300`}
+              >
+                <Card className="h-full">
+                  <CardHeader className="border-b border-divider px-6 py-4">
+                    <h2 className="text-xl font-semibold">Jadwal Kelas</h2>
+                  </CardHeader>
                   <CardBody>
-                    <p className="text-red-500">Failed to load jadwal data</p>
+                    {jadwalError ? (
+                      <div className="flex flex-col items-center justify-center p-4 text-center">
+                        <p className="text-red-500">
+                          Failed to load jadwal data
+                        </p>
+                        <Button
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => window.location.reload()}
+                        >
+                          Coba Lagi
+                        </Button>
+                      </div>
+                    ) : isJadwalLoading ? (
+                      <div className="flex items-center justify-center p-8">
+                        <Spinner
+                          color="default"
+                          label="Memuat data jadwal..."
+                        />
+                      </div>
+                    ) : jadwalData?.data?.jadwal ? (
+                      <JadwalTable
+                        jadwal={jadwalData.data.jadwal}
+                        kelas={kelas}
+                      />
+                    ) : (
+                      <p className="p-4 text-center text-gray-500">
+                        Tidak ada data jadwal ditemukan
+                      </p>
+                    )}
                   </CardBody>
                 </Card>
-              ) : jadwalData ? (
-                <JadwalTable jadwal={jadwalData.data.jadwal} kelas={kelas} />
-              ) : (
-                <Card>
-                  <CardBody>
-                    <Spinner color="default" />
-                  </CardBody>
-                </Card>
-              )}
-            </div>
-          )}
+              </div>
+            )}
 
-          {selectedOptions.includes("kelasBaru") && (
-            <div
-              className={`w-full ${selectedOptionsCount > 1 ? "md:w-1/2" : ""} transition-all duration-300`}
-            >
-              {kelasBaruError ? (
-                <Card>
+            {selectedOptions.includes("kelasBaru") && (
+              <div
+                className={`w-full ${selectedOptionsCount > 1 ? "md:w-1/2" : ""} transition-all duration-300`}
+              >
+                <Card className="h-full">
+                  <CardHeader className="border-b border-divider px-6 py-4">
+                    <h2 className="text-xl font-semibold">Kelas Baru</h2>
+                  </CardHeader>
                   <CardBody>
-                    <p className="text-red-500">
-                      Failed to load kelas baru data
-                    </p>
+                    {kelasBaruError ? (
+                      <div className="flex flex-col items-center justify-center p-4 text-center">
+                        <p className="text-red-500">
+                          Failed to load kelas baru data
+                        </p>
+                        <Button
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => window.location.reload()}
+                        >
+                          Coba Lagi
+                        </Button>
+                      </div>
+                    ) : isKelasBaruLoading ? (
+                      <div className="flex items-center justify-center p-8">
+                        <Spinner
+                          color="default"
+                          label="Memuat data kelas baru..."
+                        />
+                      </div>
+                    ) : kelasBaruData?.data ? (
+                      <MahasiswaTable
+                        data={kelasBaruData.data}
+                        type="kelasBaru"
+                      />
+                    ) : (
+                      <p className="p-4 text-center text-gray-500">
+                        Tidak ada data kelas baru ditemukan
+                      </p>
+                    )}
                   </CardBody>
                 </Card>
-              ) : kelasBaruData ? (
-                <MahasiswaTable data={kelasBaruData.data} type="kelasBaru" />
-              ) : (
-                <Card>
-                  <CardBody>
-                    <Spinner color="default" />
-                  </CardBody>
-                </Card>
-              )}
-            </div>
-          )}
+              </div>
+            )}
 
-          {selectedOptions.includes("mahasiswaBaru") && (
-            <div
-              className={`w-full ${selectedOptionsCount > 1 ? "md:w-1/2" : ""} transition-all duration-300`}
-            >
-              {mahasiswaBaruError ? (
-                <Card>
+            {selectedOptions.includes("mahasiswaBaru") && (
+              <div
+                className={`w-full ${selectedOptionsCount > 1 ? "md:w-1/2" : ""} transition-all duration-300`}
+              >
+                <Card className="h-full">
+                  <CardHeader className="border-b border-divider px-6 py-4">
+                    <h2 className="text-xl font-semibold">Mahasiswa Baru</h2>
+                  </CardHeader>
                   <CardBody>
-                    <p className="text-red-500">
-                      Failed to load mahasiswa baru data
-                    </p>
+                    {mahasiswaBaruError ? (
+                      <div className="flex flex-col items-center justify-center p-4 text-center">
+                        <p className="text-red-500">
+                          Failed to load mahasiswa baru data
+                        </p>
+                        <Button
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => window.location.reload()}
+                        >
+                          Coba Lagi
+                        </Button>
+                      </div>
+                    ) : isMahasiswaBaruLoading ? (
+                      <div className="flex items-center justify-center p-8">
+                        <Spinner
+                          color="default"
+                          label="Memuat data mahasiswa baru..."
+                        />
+                      </div>
+                    ) : mahasiswaBaruData?.data ? (
+                      <MahasiswaTable
+                        data={mahasiswaBaruData.data}
+                        type="mahasiswaBaru"
+                      />
+                    ) : (
+                      <p className="p-4 text-center text-gray-500">
+                        Tidak ada data mahasiswa baru ditemukan
+                      </p>
+                    )}
                   </CardBody>
                 </Card>
-              ) : mahasiswaBaruData ? (
-                <MahasiswaTable
-                  data={mahasiswaBaruData.data}
-                  type="mahasiswaBaru"
-                />
-              ) : (
-                <Card>
-                  <CardBody>
-                    <Spinner color="default" />
-                  </CardBody>
-                </Card>
-              )}
-            </div>
-          )}
-        </div>
+              </div>
+            )}
+          </div>
+        </section>
       )}
 
-      <Card className="mt-4 h-[422px]">
-        <CardHeader className="bg-white/60 dark:bg-zinc-800/50">
-          <div className="flex items-center justify-between p-4 dark:text-white">
+      <section aria-label="Kalender Akademik" className="mb-10">
+        <Card shadow="sm">
+          <CardHeader className="border-b border-divider bg-white/60 px-6 py-4 dark:bg-zinc-800/50">
             <h2 className="text-xl font-semibold">
               Timeline Kalender Akademik
             </h2>
-          </div>
-        </CardHeader>
-        <CardBody>
-          {isTimelineLoading ? (
-            <Skeleton className="rounded-lg">
-              <div className="h-64 rounded-lg bg-default-300"></div>
-            </Skeleton>
-          ) : (
-            eventsData && <Timeline events={eventsData.data} />
-          )}
-        </CardBody>
-      </Card>
+          </CardHeader>
+          <CardBody className="p-0">
+            {isEventsLoading ? (
+              <div className="flex items-center justify-center p-8">
+                <Spinner color="default" label="Memuat kalender akademik..." />
+              </div>
+            ) : eventsData ? (
+              <Timeline events={eventsData.data} />
+            ) : (
+              <p className="p-4 text-center text-gray-500">
+                Tidak ada data kalender ditemukan
+              </p>
+            )}
+          </CardBody>
+        </Card>
+      </section>
     </div>
   );
 }

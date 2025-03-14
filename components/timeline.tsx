@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Card, CardBody } from "@nextui-org/card";
 import { Chip } from "@nextui-org/chip";
 import { Link } from "@nextui-org/link";
@@ -95,8 +95,61 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
     position: string;
     secondsLeft: number;
   } | null>(null);
-  const [containerHeight, setContainerHeight] = useState(0);
+  const [contentHeight, setContentHeight] = useState(300); // Default height that will be adjusted
+  const [autoScrollComplete, setAutoScrollComplete] = useState(false);
 
+  // Process the events data
+  const adjustedEvents = useMemo(() => {
+    if (!events.length) return [];
+
+    return events.map((event) => {
+      const start = parseDate(event.start, event.end);
+      const end = parseDate(event.end);
+      if (isSameDay(start, end)) {
+        return {
+          ...event,
+          start: format(subDays(end, 7), "d MMMM yyyy", { locale: id }),
+        };
+      }
+      return {
+        ...event,
+        start: format(start, "d MMMM yyyy", { locale: id }),
+        end: format(end, "d MMMM yyyy", { locale: id }),
+      };
+    });
+  }, [events]);
+
+  // Calculate timeline date ranges
+  const { earliestStart, latestEnd, displayStartDate, displayEndDate } =
+    useMemo(() => {
+      if (!adjustedEvents.length) {
+        return {
+          earliestStart: new Date(),
+          latestEnd: new Date(),
+          displayStartDate: new Date(),
+          displayEndDate: new Date(),
+        };
+      }
+
+      const earliest = adjustedEvents.reduce((earliest, event) => {
+        const start = parseDate(event.start);
+        return start < earliest ? start : earliest;
+      }, parseDate(adjustedEvents[0].start));
+
+      const latest = adjustedEvents.reduce((latest, event) => {
+        const end = parseDate(event.end);
+        return end > latest ? end : latest;
+      }, parseDate(adjustedEvents[0].end));
+
+      return {
+        earliestStart: earliest,
+        latestEnd: latest,
+        displayStartDate: startOfMonth(earliest),
+        displayEndDate: addDays(latest, 27),
+      };
+    }, [adjustedEvents]);
+
+  // Update current time every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -105,47 +158,103 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
     return () => clearInterval(timer);
   }, []);
 
+  // Calculate appropriate height based on content and lanes
   useEffect(() => {
-    const updateHeight = () => {
-      if (timelineRef.current) {
-        const windowHeight = window.innerHeight;
-        const timelineTop = timelineRef.current.getBoundingClientRect().top;
-        const newHeight = windowHeight - timelineTop - 20;
-        setContainerHeight(newHeight);
-      }
-    };
+    if (timelineRef.current && events.length > 0) {
+      const eventPositions = calculateEventPositions(adjustedEvents);
+      const maxLaneIndex = Math.max(
+        ...eventPositions.map((e) => e.laneIndex),
+        0,
+      );
+      const laneHeight = 36;
+      const headerHeight = 80;
 
-    updateHeight();
-    window.addEventListener("resize", updateHeight);
+      // Calculate minimum needed height (lanes + header + some padding)
+      const neededHeight = headerHeight + (maxLaneIndex + 1) * laneHeight + 20;
 
-    return () => window.removeEventListener("resize", updateHeight);
-  }, []);
-
-  useEffect(() => {
-    if (scrollContainerRef.current && events.length > 0) {
-      const currentDate = new Date();
-      const earliestStart = parseDate(events[0].start);
-      const latestEnd = parseDate(events[events.length - 1].end);
-
-      if (
-        isWithinInterval(currentDate, { start: earliestStart, end: latestEnd })
-      ) {
-        const diffInSeconds = differenceInSeconds(
-          currentDate,
-          displayStartDate,
-        );
-        const diffInDays = diffInSeconds / (24 * 60 * 60);
-        const scrollPosition = diffInDays * 40;
-
-        const containerWidth = scrollContainerRef.current.clientWidth;
-        scrollContainerRef.current.scrollLeft = Math.max(
-          0,
-          scrollPosition - containerWidth * 0.1,
-        );
-      }
+      // Use a reasonable height based on content, with minimum and maximum constraints
+      const calculatedHeight = Math.max(Math.min(neededHeight, 500), 250);
+      setContentHeight(calculatedHeight);
     }
-  }, [events]);
+  }, [events, adjustedEvents]);
 
+  // Auto-scroll to current date on initial render
+  useEffect(() => {
+    if (
+      scrollContainerRef.current &&
+      events.length > 0 &&
+      !autoScrollComplete &&
+      adjustedEvents.length > 0
+    ) {
+      // Wait a bit for the DOM to fully render
+      setTimeout(() => {
+        if (!scrollContainerRef.current) return;
+
+        const currentDate = new Date();
+
+        // Find position to scroll to - default to current date if within range
+        let targetDate = currentDate;
+        let isCurrentDateInRange = isWithinInterval(currentDate, {
+          start: earliestStart,
+          end: latestEnd,
+        });
+
+        if (!isCurrentDateInRange) {
+          // If current date is outside range, scroll to earliest upcoming event or latest past event
+          if (isBefore(currentDate, earliestStart)) {
+            targetDate = earliestStart;
+          } else {
+            targetDate = latestEnd;
+          }
+        }
+
+        // Calculate the day index from the start of the display range
+        const diffDays = differenceInDays(targetDate, displayStartDate);
+
+        // Each day is 40px wide
+        const dayWidth = 40;
+        const scrollPosition = diffDays * dayWidth;
+
+        // Get the container width to center the target date
+        const containerWidth = scrollContainerRef.current.clientWidth;
+
+        // Center the target date with an offset to show more future events
+        // Use 0.4 to position the current date slightly left of center (40% from left edge)
+        const targetScrollPosition = Math.max(
+          0,
+          scrollPosition - containerWidth * 0.4,
+        );
+
+        // Scroll to the calculated position with smooth animation
+        scrollContainerRef.current.scrollTo({
+          left: targetScrollPosition,
+          behavior: "smooth",
+        });
+
+        // Add a brief highlight effect to the current date marker
+        const currentTimeMarker = timelineRef.current?.querySelector(
+          ".current-time-marker",
+        );
+        if (currentTimeMarker instanceof HTMLElement) {
+          currentTimeMarker.classList.add("pulse-animation");
+          setTimeout(() => {
+            currentTimeMarker.classList.remove("pulse-animation");
+          }, 2000);
+        }
+
+        setAutoScrollComplete(true);
+      }, 500); // Slightly longer timeout to ensure rendering is complete
+    }
+  }, [
+    events,
+    autoScrollComplete,
+    displayStartDate,
+    earliestStart,
+    latestEnd,
+    adjustedEvents,
+  ]);
+
+  // Update selected event status when time changes
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -157,6 +266,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
     return () => clearInterval(timer);
   }, [selectedEvent]);
 
+  // Update status when selected event changes
   useEffect(() => {
     if (selectedEvent) {
       setSelectedEventStatus(getEventStatus(selectedEvent));
@@ -211,35 +321,6 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
   };
 
   const weekdays = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
-
-  const adjustedEvents = events.map((event) => {
-    const start = parseDate(event.start, event.end);
-    const end = parseDate(event.end);
-    if (isSameDay(start, end)) {
-      return {
-        ...event,
-        start: format(subDays(end, 7), "d MMMM yyyy", { locale: id }),
-      };
-    }
-    return {
-      ...event,
-      start: format(start, "d MMMM yyyy", { locale: id }),
-      end: format(end, "d MMMM yyyy", { locale: id }),
-    };
-  });
-
-  const earliestStart = adjustedEvents.reduce((earliest, event) => {
-    const start = parseDate(event.start);
-    return start < earliest ? start : earliest;
-  }, parseDate(adjustedEvents[0].start));
-
-  const latestEnd = adjustedEvents.reduce((latest, event) => {
-    const end = parseDate(event.end);
-    return end > latest ? end : latest;
-  }, parseDate(adjustedEvents[0].end));
-
-  const displayEndDate = addDays(latestEnd, 27);
-  const displayStartDate = startOfMonth(earliestStart);
 
   const allDates = [];
   let currentDate = displayStartDate;
@@ -297,17 +378,18 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
   const maxLaneIndex = Math.max(...eventPositions.map((e) => e.laneIndex));
   const laneHeight = 36;
   const headerHeight = 80;
-  const eventAreaHeight = containerHeight - headerHeight;
+  const eventAreaHeight = contentHeight - headerHeight;
   const maxLanes = Math.floor(eventAreaHeight / laneHeight);
   const visibleLanes = Math.min(maxLanes, maxLaneIndex + 1);
 
   return (
-    <div className="" style={{ height: `${containerHeight}px` }}>
+    <div className="timeline-container">
       <Card className="overflow-hidden">
         <CardBody className="p-0">
           <div
             className="overflow-x-auto overflow-y-hidden"
             ref={scrollContainerRef}
+            style={{ height: `${contentHeight}px` }}
           >
             <div className="relative flex min-w-max flex-col" ref={timelineRef}>
               <div className="relative flex min-w-max flex-col">
@@ -419,10 +501,10 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     );
                   })}
                   <div
-                    className="absolute bottom-0 top-[-40px] z-20 w-[2px] cursor-default bg-black transition-opacity hover:opacity-10 dark:bg-white"
+                    className="current-time-marker absolute bottom-0 top-[-40px] z-20 w-[2px] cursor-default bg-black transition-opacity hover:opacity-10 dark:bg-white"
                     style={{ left: `${currentTimePosition}px` }}
                   >
-                    <div className="absolute left-[-30px] top-[-20px] rounded-full bg-black px-2 py-1 text-xs text-white dark:bg-white dark:text-black">
+                    <div className="absolute left-[-30px] top-[-20px] rounded-full bg-black px-2 py-1 text-xs text-white shadow-lg dark:bg-white dark:text-black">
                       {format(currentTime, "HH:mm:ss")}
                     </div>
                   </div>
@@ -490,6 +572,27 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
           )}
         </ModalContent>
       </Modal>
+
+      <style jsx>{`
+        .pulse-animation {
+          animation: pulse 1.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+          0% {
+            opacity: 0.3;
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+          }
+          50% {
+            opacity: 1;
+            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+          }
+          100% {
+            opacity: 0.8;
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+          }
+        }
+      `}</style>
     </div>
   );
 };

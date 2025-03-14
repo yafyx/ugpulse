@@ -10,6 +10,11 @@ const nextConfig = {
   images: {
     domains: ["nextui.org"],
   },
+  experimental: {
+    turbo: {
+      enabled: true,
+    },
+  },
 };
 
 module.exports = withPWA(nextConfig);

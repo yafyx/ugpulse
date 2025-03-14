@@ -1,6 +1,5 @@
 import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";
-import { Link } from "@nextui-org/link";
 import clsx from "clsx";
 
 import { Providers } from "./providers";
@@ -23,6 +22,18 @@ export const metadata: Metadata = {
       { url: "/icons/icon-512x512.png" },
     ],
   },
+  applicationName: "UG Connect",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "UGC",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export const viewport: Viewport = {
@@ -30,6 +41,9 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: light)", color: "white" },
     { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -38,30 +52,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning lang="en">
-      <head>
-        <meta name="application-name" content="UG Connect" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="UGC" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#000000" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-      </head>
+    <html suppressHydrationWarning lang="en" className={fontSans.variable}>
       <body
         className={clsx(
           "bg-gradient-to-br from-[#f0f0f0] to-[#e0e0e0] font-sans antialiased dark:from-[#000000] dark:to-[#000000]",
-          fontSans.variable,
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <div className="relative flex flex-col">
+          <div className="relative flex min-h-screen flex-col">
             <Navbar />
-            <main className="container mx-auto min-h-screen max-w-full flex-grow pt-8 sm:px-4">
+            <main className="container mx-auto max-w-full flex-grow pt-8 sm:px-4">
               {children}
             </main>
-            <footer className="flex w-full items-center justify-center py-3"></footer>
+            <footer
+              className="flex w-full items-center justify-center py-3"
+              aria-label="Footer"
+            >
+              <p className="text-sm text-gray-500">
+                © {new Date().getFullYear()} UG Connect
+              </p>
+            </footer>
           </div>
         </Providers>
       </body>
