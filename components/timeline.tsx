@@ -572,7 +572,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     return (
                       <div
                         key={index}
-                        className={`${eventColors[index % eventColors.length]} absolute flex h-8 cursor-pointer items-center overflow-visible rounded-full p-2 text-white transition-all duration-300 hover:z-20 hover:shadow-md ${isActive ? "border border-white/20" : "border-0"}`}
+                        className={`${eventColors[index % eventColors.length]} absolute flex h-8 cursor-pointer items-center overflow-visible rounded-full border border-white/20 p-2 text-white transition-all duration-300 hover:z-20 hover:shadow-md`}
                         style={{
                           width: `${width}px`,
                           left: `${left}px`,
@@ -583,35 +583,46 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                         }}
                         onClick={() => handleEventClick(event)}
                       >
-                        {status.position === "start" && (
-                          <Tooltip
-                            placement="right"
-                            content={`${status.full} ${formatTimeLeft(status.secondsLeft)}`}
-                          >
-                            <Chip
-                              size="sm"
-                              variant="solid"
-                              className="mr-1 bg-black/10 text-white"
-                            >
-                              {status.short}
-                            </Chip>
-                          </Tooltip>
-                        )}
                         <span className="sticky left-1 z-10 flex flex-col truncate text-ellipsis whitespace-nowrap pl-1 text-sm font-medium text-white drop-shadow-sm sm:text-base">
                           {event.kegiatan}
                         </span>
-                        {status.position === "end" && (
-                          <Tooltip
-                            content={`${status.full} ${formatTimeLeft(status.secondsLeft)}`}
-                          >
+
+                        {status.position === "start" && (
+                          <div className="group absolute right-[calc(100%+5px)] z-30">
                             <Chip
                               size="sm"
                               variant="solid"
-                              className="ml-2 bg-black/10 text-white"
+                              className="whitespace-nowrap bg-zinc-800/95 text-white transition-all duration-300 group-hover:opacity-0 dark:bg-zinc-700/95"
                             >
                               {status.short}
                             </Chip>
-                          </Tooltip>
+                            <Chip
+                              size="sm"
+                              variant="solid"
+                              className="absolute left-0 top-0 w-auto max-w-0 scale-90 overflow-hidden whitespace-nowrap bg-zinc-800/95 text-white opacity-0 transition-all duration-300 group-hover:max-w-[300px] group-hover:scale-100 group-hover:opacity-100 dark:bg-zinc-700/95"
+                            >
+                              {`${status.full} ${formatTimeLeft(status.secondsLeft)}`}
+                            </Chip>
+                          </div>
+                        )}
+
+                        {status.position === "end" && (
+                          <div className="group absolute left-[calc(100%+5px)] z-30">
+                            <Chip
+                              size="sm"
+                              variant="solid"
+                              className="whitespace-nowrap bg-zinc-800/95 text-white transition-all duration-300 group-hover:opacity-0 dark:bg-zinc-700/95"
+                            >
+                              {status.short}
+                            </Chip>
+                            <Chip
+                              size="sm"
+                              variant="solid"
+                              className="absolute left-0 top-0 w-auto max-w-0 scale-90 overflow-hidden whitespace-nowrap bg-zinc-800/95 text-white opacity-0 transition-all duration-300 group-hover:max-w-[300px] group-hover:scale-100 group-hover:opacity-100 dark:bg-zinc-700/95"
+                            >
+                              {`${status.full} ${formatTimeLeft(status.secondsLeft)}`}
+                            </Chip>
+                          </div>
                         )}
                       </div>
                     );
