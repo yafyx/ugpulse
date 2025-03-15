@@ -496,7 +496,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
             <div className="relative flex min-w-max flex-col" ref={timelineRef}>
               <div className="relative flex min-w-max flex-col">
                 {/* Grid background with simpler styling */}
-                <div className="pointer-events-none absolute bottom-0 left-[-20px] right-0 top-28">
+                <div className="pointer-events-none absolute bottom-0 left-0 right-0 top-28">
                   <div className="h-full w-full bg-[linear-gradient(to_right,transparent_39px,rgba(161,161,170,0.03)_39px,rgba(161,161,170,0.03)_40px,transparent_40px)] bg-[length:40px_100%] bg-repeat-x"></div>
                 </div>
                 <div className="sticky top-0 z-10 flex items-center bg-white/95 p-2 shadow-sm dark:bg-zinc-900/95 dark:text-white">
@@ -592,10 +592,6 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                           <Tooltip
                             placement="right"
                             content={`${status.full} ${formatTimeLeft(status.secondsLeft)}`}
-                            classNames={{
-                              base: "py-2 px-4 shadow-md rounded-lg border border-zinc-800/10 bg-zinc-900/90 dark:bg-zinc-800/90",
-                              content: "text-white",
-                            }}
                           >
                             <Chip
                               size="sm"
@@ -606,7 +602,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                             </Chip>
                           </Tooltip>
                         )}
-                        <span className="sticky left-0 z-10 flex flex-col truncate text-ellipsis whitespace-nowrap text-sm font-medium text-white drop-shadow-sm sm:text-base">
+                        <span className="sticky left-1 z-10 flex flex-col truncate text-ellipsis whitespace-nowrap pl-1 text-sm font-medium text-white drop-shadow-sm sm:text-base">
                           {event.kegiatan}
                         </span>
                         {status.position === "end" && (
@@ -631,6 +627,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     className="current-time-marker absolute bottom-0 top-[-40px] z-20 w-[2px] cursor-default bg-zinc-800 transition-all duration-300 dark:bg-zinc-300"
                     style={{
                       left: `${currentTimePosition}px`,
+                      transform: "translateX(-50%)",
                       opacity: isHoveringMarker ? 0.5 : 1,
                     }}
                     onMouseEnter={() => setIsHoveringMarker(true)}
