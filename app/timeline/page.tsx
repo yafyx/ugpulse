@@ -47,7 +47,6 @@ export default function TimelinePage() {
 
   return (
     <div className="relative min-h-screen bg-zinc-100 p-4 dark:bg-zinc-900">
-      {/* Decorative background elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-zinc-200/50 blur-3xl dark:bg-zinc-800/40"></div>
         <div className="absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-zinc-300/40 blur-3xl dark:bg-zinc-700/30"></div>
@@ -65,7 +64,7 @@ export default function TimelinePage() {
           </p>
         </div>
 
-        <div className="mb-10 w-full rounded-lg border border-zinc-200/20 bg-white/5 p-4 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/20">
+        <div className="w-full overflow-visible">
           <Timeline events={eventsData.data} />
         </div>
       </div>

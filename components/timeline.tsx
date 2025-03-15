@@ -173,9 +173,8 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
       // Calculate minimum needed height (lanes + header + some padding)
       const neededHeight = headerHeight + (maxLaneIndex + 1) * laneHeight + 20;
 
-      // Use a reasonable height based on content, with minimum constraints
-      // Remove the maximum constraint to allow full display or scrolling
-      const calculatedHeight = Math.max(neededHeight, 250);
+      // Use exact needed height without minimum constraints to avoid scrolling
+      const calculatedHeight = neededHeight;
       setContentHeight(calculatedHeight);
     }
   }, [events, adjustedEvents]);
@@ -293,6 +292,28 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
     }
   };
 
+  useEffect(() => {
+    // We need to handle wheel events at the document level to properly
+    // manage when to prevent default scrolling
+    const handleDocumentWheel = (e: WheelEvent) => {
+      if (!scrollContainerRef.current || !isMouseOverTimeline) return;
+
+      // Check if the mouse is over the timeline component
+      // If so, prevent the default scroll and handle horizontal scrolling
+      if (isMouseOverTimeline) {
+        e.preventDefault();
+        scrollContainerRef.current.scrollLeft += e.deltaY * SCROLL_SENSITIVITY;
+      }
+    };
+
+    // We need to use passive: false to be able to prevent default
+    document.addEventListener("wheel", handleDocumentWheel, { passive: false });
+
+    return () => {
+      document.removeEventListener("wheel", handleDocumentWheel);
+    };
+  }, [isMouseOverTimeline]);
+
   const getEventStatus = (event: Event) => {
     const start = parseDate(event.start);
     const end = parseDate(event.end);
@@ -403,29 +424,6 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
   // Remove the limit on visible lanes to show all events
   const visibleLanes = maxLaneIndex + 1;
 
-  // Set up the wheel event listener on the document
-  useEffect(() => {
-    // We need to handle wheel events at the document level to properly
-    // manage when to prevent default scrolling
-    const handleDocumentWheel = (e: WheelEvent) => {
-      if (!scrollContainerRef.current || !isMouseOverTimeline) return;
-
-      // Check if the mouse is over the timeline component
-      // If so, prevent the default scroll and handle horizontal scrolling
-      if (isMouseOverTimeline) {
-        e.preventDefault();
-        scrollContainerRef.current.scrollLeft += e.deltaY * SCROLL_SENSITIVITY;
-      }
-    };
-
-    // We need to use passive: false to be able to prevent default
-    document.addEventListener("wheel", handleDocumentWheel, { passive: false });
-
-    return () => {
-      document.removeEventListener("wheel", handleDocumentWheel);
-    };
-  }, [isMouseOverTimeline]);
-
   return (
     <div
       className="timeline-container relative"
@@ -435,9 +433,6 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
       <Card className="overflow-hidden border border-zinc-200/20 bg-white/90 shadow-md dark:border-zinc-700/30 dark:bg-zinc-900/90">
         <CardBody className="p-0">
           <div className="flex items-center justify-between border-b border-zinc-200/30 p-4 dark:border-zinc-700/30">
-            <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
-              Timeline Akademik
-            </h3>
             <div className="ml-auto flex items-center gap-2">
               <div className="hidden rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-xs text-zinc-500 dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400 md:block">
                 Scroll untuk melihat lebih banyak
@@ -486,31 +481,31 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
             </div>
           </div>
           <div
-            className="scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-700 scrollbar-track-transparent overflow-x-auto"
+            className="scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-700 scrollbar-track-transparent overflow-x-auto overflow-y-hidden"
             ref={scrollContainerRef}
             style={{
-              height: `${Math.min(contentHeight, 400)}px`,
-              maxHeight: "400px",
+              height: "auto",
             }}
           >
             <div className="relative flex min-w-max flex-col" ref={timelineRef}>
               <div className="relative flex min-w-max flex-col">
-                {/* Grid background with simpler styling */}
                 <div className="pointer-events-none absolute bottom-0 left-0 right-0 top-28">
                   <div className="h-full w-full bg-[linear-gradient(to_right,transparent_39px,rgba(161,161,170,0.03)_39px,rgba(161,161,170,0.03)_40px,transparent_40px)] bg-[length:40px_100%] bg-repeat-x"></div>
                 </div>
                 <div className="sticky top-0 z-10 flex items-center bg-white/95 p-2 shadow-sm dark:bg-zinc-900/95 dark:text-white">
-                  {Object.keys(months).map((monthKey) => (
+                  {Object.keys(months).map((monthKey, monthIdx) => (
                     <div
                       key={monthKey}
-                      className="flex flex-col items-start"
+                      className="relative flex flex-col items-start"
                       style={{ width: `${months[monthKey].length * 40}px` }}
                     >
-                      <h3 className="p-2 text-2xl font-bold text-zinc-800 dark:text-zinc-100">
-                        {format(months[monthKey][0], "MMMM yyyy", {
-                          locale: id,
-                        })}
-                      </h3>
+                      <div className="sticky left-0 z-10 bg-white/95 p-2 dark:bg-zinc-900/95">
+                        <h3 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100">
+                          {format(months[monthKey][0], "MMMM yyyy", {
+                            locale: id,
+                          })}
+                        </h3>
+                      </div>
                       <div className="flex">
                         {months[monthKey].map((date, index) => (
                           <div

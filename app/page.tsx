@@ -458,13 +458,13 @@ export default function Home() {
               Timeline Kalender Akademik
             </h2>
           </CardHeader>
-          <CardBody className="p-0">
+          <CardBody className="overflow-visible p-0">
             {isEventsLoading ? (
               <div className="flex items-center justify-center p-8">
                 <Spinner color="default" label="Memuat kalender akademik..." />
               </div>
             ) : eventsData ? (
-              <div className="w-full">
+              <div className="w-full overflow-visible">
                 <Timeline events={eventsData.data} />
               </div>
             ) : (
