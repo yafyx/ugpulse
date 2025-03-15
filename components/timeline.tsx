@@ -98,6 +98,21 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
   const [autoScrollComplete, setAutoScrollComplete] = useState(false);
   const [isMouseOverTimeline, setIsMouseOverTimeline] = useState(false);
   const [isHoveringMarker, setIsHoveringMarker] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
 
   // Process the events data
   const adjustedEvents = useMemo(() => {
@@ -173,11 +188,13 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
       // Calculate minimum needed height (lanes + header + some padding)
       const neededHeight = headerHeight + (maxLaneIndex + 1) * laneHeight + 20;
 
-      // Use exact needed height without minimum constraints to avoid scrolling
-      const calculatedHeight = neededHeight;
+      // Add extra height on mobile for better visibility
+      const calculatedHeight = isMobile
+        ? Math.max(neededHeight, 400)
+        : neededHeight;
       setContentHeight(calculatedHeight);
     }
-  }, [events, adjustedEvents]);
+  }, [events, adjustedEvents, isMobile]);
 
   // Auto-scroll to current date on initial render
   useEffect(() => {
@@ -437,6 +454,9 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
               <div className="hidden rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-xs text-zinc-500 dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400 md:block">
                 Scroll untuk melihat lebih banyak
               </div>
+              <div className="block rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-xs text-zinc-500 dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400 md:hidden">
+                Geser untuk melihat timeline
+              </div>
               <Button
                 size="sm"
                 variant="flat"
@@ -572,9 +592,9 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     return (
                       <div
                         key={index}
-                        className={`${eventColors[index % eventColors.length]} absolute flex h-8 cursor-pointer items-center overflow-visible rounded-full border border-white/20 p-2 text-white transition-all duration-300 hover:z-20 hover:shadow-md`}
+                        className={`${eventColors[index % eventColors.length]} absolute flex h-8 cursor-pointer items-center overflow-visible rounded-full border border-white/20 p-2 text-white transition-all duration-300 hover:z-20 hover:shadow-md ${isMobile ? "z-10 min-w-[120px]" : ""}`}
                         style={{
-                          width: `${width}px`,
+                          width: `${isMobile && width < 120 ? 120 : width}px`,
                           left: `${left}px`,
                           top: `${event.laneIndex * laneHeight}px`,
                           boxShadow: isActive
@@ -587,7 +607,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                           {event.kegiatan}
                         </span>
 
-                        {status.position === "start" && (
+                        {!isMobile && status.position === "start" && (
                           <div className="group absolute right-[calc(100%+5px)] z-30">
                             <Chip
                               size="sm"
@@ -606,7 +626,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                           </div>
                         )}
 
-                        {status.position === "end" && (
+                        {!isMobile && status.position === "end" && (
                           <div className="group absolute left-[calc(100%+5px)] z-30">
                             <Chip
                               size="sm"

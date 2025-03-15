@@ -458,30 +458,19 @@ export default function Home() {
 
       <section aria-label="Kalender Akademik" className="mb-12 px-4 sm:px-6">
         <h2 className="mb-6 text-2xl font-semibold text-zinc-800 dark:text-zinc-100">
-          Kalender Akademik
+          Timeline Akademik
         </h2>
-        <Card className="border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
-          <CardHeader className="border-b border-zinc-200/30 px-5 py-4 dark:border-zinc-700/30">
-            <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
-              Timeline Kegiatan
-            </h3>
-          </CardHeader>
-          <CardBody className="overflow-visible p-0">
-            {isEventsLoading ? (
-              <div className="flex items-center justify-center p-8">
-                <Spinner color="default" label="Memuat kalender akademik..." />
-              </div>
-            ) : eventsData ? (
-              <div className="w-full overflow-visible p-4">
-                <Timeline events={eventsData.data} />
-              </div>
-            ) : (
-              <p className="p-4 text-center text-zinc-500 dark:text-zinc-400">
-                Tidak ada data kalender ditemukan
-              </p>
-            )}
-          </CardBody>
-        </Card>
+        {isEventsLoading ? (
+          <div className="flex items-center justify-center bg-white/80 p-8 dark:bg-zinc-800/80">
+            <Spinner color="default" label="Memuat kalender akademik..." />
+          </div>
+        ) : eventsData ? (
+          <Timeline events={eventsData.data} />
+        ) : (
+          <p className="bg-white/80 p-4 text-center text-zinc-500 dark:bg-zinc-800/80 dark:text-zinc-400">
+            Tidak ada data kalender ditemukan
+          </p>
+        )}
       </section>
     </div>
   );
