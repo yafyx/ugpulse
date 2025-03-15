@@ -500,7 +500,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                       style={{ width: `${months[monthKey].length * 40}px` }}
                     >
                       <div className="sticky left-0 z-10 bg-white/95 p-2 dark:bg-zinc-900/95">
-                        <h3 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100">
+                        <h3 className="bg-gradient-to-b from-purple-800 to-purple-400 bg-clip-text text-2xl font-bold text-transparent">
                           {format(months[monthKey][0], "MMMM yyyy", {
                             locale: id,
                           })}
