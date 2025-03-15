@@ -34,23 +34,23 @@ interface Event {
   end: string;
 }
 
-// Monochromatic color scheme for events
+// Monochromatic color scheme for events - slightly lightened for better contrast
 const eventColors = [
-  "bg-zinc-800 dark:bg-zinc-800",
-  "bg-zinc-700 dark:bg-zinc-700",
-  "bg-zinc-900 dark:bg-zinc-900",
-  "bg-slate-800 dark:bg-slate-800",
-  "bg-slate-700 dark:bg-slate-700",
-  "bg-slate-900 dark:bg-slate-900",
-  "bg-stone-800 dark:bg-stone-800",
-  "bg-stone-700 dark:bg-stone-700",
-  "bg-stone-900 dark:bg-stone-900",
-  "bg-gray-800 dark:bg-gray-800",
-  "bg-gray-700 dark:bg-gray-700",
-  "bg-gray-900 dark:bg-gray-900",
-  "bg-neutral-800 dark:bg-neutral-800",
-  "bg-neutral-700 dark:bg-neutral-700",
-  "bg-neutral-900 dark:bg-neutral-900",
+  "bg-zinc-800/95 dark:bg-zinc-800/95",
+  "bg-zinc-700/95 dark:bg-zinc-700/95",
+  "bg-zinc-900/95 dark:bg-zinc-900/95",
+  "bg-slate-800/95 dark:bg-slate-800/95",
+  "bg-slate-700/95 dark:bg-slate-700/95",
+  "bg-slate-900/95 dark:bg-slate-900/95",
+  "bg-stone-800/95 dark:bg-stone-800/95",
+  "bg-stone-700/95 dark:bg-stone-700/95",
+  "bg-stone-900/95 dark:bg-stone-900/95",
+  "bg-gray-800/95 dark:bg-gray-800/95",
+  "bg-gray-700/95 dark:bg-gray-700/95",
+  "bg-gray-900/95 dark:bg-gray-900/95",
+  "bg-neutral-800/95 dark:bg-neutral-800/95",
+  "bg-neutral-700/95 dark:bg-neutral-700/95",
+  "bg-neutral-900/95 dark:bg-neutral-900/95",
 ];
 
 const parseDate = (dateString: string, endDateString?: string) => {
@@ -432,20 +432,20 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Card className="overflow-hidden border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-900/60">
+      <Card className="overflow-hidden border border-zinc-200/20 bg-white/90 shadow-md dark:border-zinc-700/30 dark:bg-zinc-900/90">
         <CardBody className="p-0">
           <div className="flex items-center justify-between border-b border-zinc-200/30 p-4 dark:border-zinc-700/30">
             <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
               Timeline Akademik
             </h3>
             <div className="ml-auto flex items-center gap-2">
-              <div className="hidden rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-xs text-zinc-500 backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400 md:block">
+              <div className="hidden rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-xs text-zinc-500 dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400 md:block">
                 Scroll untuk melihat lebih banyak
               </div>
               <Button
                 size="sm"
                 variant="flat"
-                className="bg-zinc-100/20 text-zinc-800 backdrop-blur-sm hover:bg-zinc-200/30 dark:bg-zinc-800/30 dark:text-zinc-200 dark:hover:bg-zinc-700/40"
+                className="bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
                 onClick={() => {
                   // Scroll to current date
                   if (scrollContainerRef.current) {
@@ -495,11 +495,11 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
           >
             <div className="relative flex min-w-max flex-col" ref={timelineRef}>
               <div className="relative flex min-w-max flex-col">
-                {/* Grid background with subtle glass effect */}
+                {/* Grid background with simpler styling */}
                 <div className="pointer-events-none absolute bottom-0 left-[-20px] right-0 top-28">
-                  <div className="h-full w-full bg-[linear-gradient(to_right,transparent_39px,rgba(161,161,170,0.05)_39px,rgba(161,161,170,0.05)_40px,transparent_40px)] bg-[length:40px_100%] bg-repeat-x"></div>
+                  <div className="h-full w-full bg-[linear-gradient(to_right,transparent_39px,rgba(161,161,170,0.03)_39px,rgba(161,161,170,0.03)_40px,transparent_40px)] bg-[length:40px_100%] bg-repeat-x"></div>
                 </div>
-                <div className="sticky top-0 z-10 flex items-center bg-white/90 p-2 shadow-sm backdrop-blur-md dark:bg-zinc-900/90 dark:text-white">
+                <div className="sticky top-0 z-10 flex items-center bg-white/95 p-2 shadow-sm dark:bg-zinc-900/95 dark:text-white">
                   {Object.keys(months).map((monthKey) => (
                     <div
                       key={monthKey}
@@ -577,13 +577,13 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     return (
                       <div
                         key={index}
-                        className={`${eventColors[index % eventColors.length]} absolute flex h-8 cursor-pointer items-center overflow-visible rounded-full p-2 text-white transition-all duration-300 hover:z-20 hover:shadow-xl ${isActive ? "border-2 border-white/80" : "border border-white/30"} backdrop-blur-md backdrop-saturate-150 hover:scale-[1.02]`}
+                        className={`${eventColors[index % eventColors.length]} absolute flex h-8 cursor-pointer items-center overflow-visible rounded-full p-2 text-white transition-all duration-300 hover:z-20 hover:shadow-md ${isActive ? "border border-white/20" : "border-0"}`}
                         style={{
                           width: `${width}px`,
                           left: `${left}px`,
                           top: `${event.laneIndex * laneHeight}px`,
                           boxShadow: isActive
-                            ? "0 0 15px rgba(0, 0, 0, 0.3)"
+                            ? "0 0 10px rgba(0, 0, 0, 0.2)"
                             : "none",
                         }}
                         onClick={() => handleEventClick(event)}
@@ -593,34 +593,30 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                             placement="right"
                             content={`${status.full} ${formatTimeLeft(status.secondsLeft)}`}
                             classNames={{
-                              base: "py-2 px-4 shadow-xl rounded-lg border border-zinc-800/20 backdrop-blur-md bg-zinc-900/90 dark:bg-zinc-800/90",
+                              base: "py-2 px-4 shadow-md rounded-lg border border-zinc-800/10 bg-zinc-900/90 dark:bg-zinc-800/90",
                               content: "text-white",
                             }}
                           >
                             <Chip
                               size="sm"
                               variant="solid"
-                              className="mr-1 border border-white/10 bg-black/20 text-white backdrop-blur-md"
+                              className="mr-1 bg-black/10 text-white"
                             >
                               {status.short}
                             </Chip>
                           </Tooltip>
                         )}
-                        <span className="sticky left-0 z-10 flex flex-col truncate text-ellipsis whitespace-nowrap text-sm font-medium text-white drop-shadow-lg sm:text-base">
+                        <span className="sticky left-0 z-10 flex flex-col truncate text-ellipsis whitespace-nowrap text-sm font-medium text-white drop-shadow-sm sm:text-base">
                           {event.kegiatan}
                         </span>
                         {status.position === "end" && (
                           <Tooltip
                             content={`${status.full} ${formatTimeLeft(status.secondsLeft)}`}
-                            classNames={{
-                              base: "py-2 px-4 shadow-xl rounded-lg border border-zinc-800/20 backdrop-blur-md bg-zinc-900/90 dark:bg-zinc-800/90",
-                              content: "text-white",
-                            }}
                           >
                             <Chip
                               size="sm"
                               variant="solid"
-                              className="ml-2 border border-white/10 bg-black/20 text-white backdrop-blur-md"
+                              className="ml-2 bg-black/10 text-white"
                             >
                               {status.short}
                             </Chip>
@@ -630,7 +626,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     );
                   })}
 
-                  {/* Current time marker with more elegant design */}
+                  {/* Current time marker with simpler design */}
                   <div
                     className="current-time-marker absolute bottom-0 top-[-40px] z-20 w-[2px] cursor-default bg-zinc-800 transition-all duration-300 dark:bg-zinc-300"
                     style={{
@@ -640,10 +636,10 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     onMouseEnter={() => setIsHoveringMarker(true)}
                     onMouseLeave={() => setIsHoveringMarker(false)}
                   >
-                    <div className="absolute left-[-40px] top-[-30px] rounded-xl border border-zinc-300/30 bg-zinc-800 px-3 py-1.5 text-xs text-white shadow-md backdrop-blur-md dark:border-zinc-600/30 dark:bg-zinc-800">
+                    <div className="absolute left-[-40px] top-[-30px] rounded-xl border border-zinc-300/20 bg-zinc-800 px-3 py-1.5 text-xs text-white shadow-sm dark:border-zinc-600/20 dark:bg-zinc-800">
                       {format(currentTime, "HH:mm:ss")}
                     </div>
-                    <div className="absolute left-[-4px] top-[-10px] h-4 w-4 rounded-full border-2 border-zinc-800 bg-white shadow-md dark:border-zinc-300 dark:bg-zinc-900"></div>
+                    <div className="absolute left-[-4px] top-[-10px] h-4 w-4 rounded-full border-2 border-zinc-800 bg-white shadow-sm dark:border-zinc-300 dark:bg-zinc-900"></div>
                   </div>
                 </div>
               </div>
@@ -652,34 +648,32 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
         </CardBody>
       </Card>
 
-      {/* Refined modal with monochromatic design */}
+      {/* Simplified modal design */}
       <Modal
         placement="center"
         hideCloseButton={false}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         classNames={{
-          base: "bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200/30 dark:border-zinc-700/30 shadow-xl",
-          header: "border-b border-zinc-200/30 dark:border-zinc-700/30",
-          footer: "border-t border-zinc-200/30 dark:border-zinc-700/30",
+          base: "bg-white/95 dark:bg-zinc-900/95 border border-zinc-200/20 dark:border-zinc-700/20 shadow-md",
+          header: "border-b border-zinc-200/20 dark:border-zinc-700/20",
+          footer: "border-t border-zinc-200/20 dark:border-zinc-700/20",
         }}
         motionProps={{
           variants: {
             enter: {
               y: 0,
               opacity: 1,
-              scale: 1,
               transition: {
-                duration: 0.2,
+                duration: 0.15,
                 ease: "easeOut",
               },
             },
             exit: {
               y: 5,
               opacity: 0,
-              scale: 0.98,
               transition: {
-                duration: 0.15,
+                duration: 0.1,
                 ease: "easeIn",
               },
             },
@@ -709,7 +703,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
               <ModalFooter className="items-center justify-between">
                 <Chip
                   variant="solid"
-                  className="border border-zinc-200/20 bg-zinc-800 text-white shadow-sm dark:border-zinc-700/30"
+                  className="border-0 bg-zinc-800/90 text-white"
                 >
                   {selectedEventStatus &&
                     `${selectedEventStatus.full} ${formatTimeLeft(selectedEventStatus.secondsLeft)}`}
@@ -718,7 +712,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                   size="sm"
                   variant="light"
                   onPress={onClose}
-                  className="bg-zinc-100/20 text-zinc-800 backdrop-blur-sm hover:bg-zinc-200/30 dark:bg-zinc-800/30 dark:text-zinc-200 dark:hover:bg-zinc-700/40"
+                  className="bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
                 >
                   Tutup
                 </Button>
@@ -736,11 +730,11 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
         @keyframes pulse {
           0% {
             opacity: 0.3;
-            box-shadow: 0 0 0 0 rgba(24, 24, 27, 0.7);
+            box-shadow: 0 0 0 0 rgba(24, 24, 27, 0.5);
           }
           50% {
             opacity: 1;
-            box-shadow: 0 0 0 15px rgba(24, 24, 27, 0);
+            box-shadow: 0 0 0 10px rgba(24, 24, 27, 0);
           }
           100% {
             opacity: 0.8;
@@ -750,34 +744,34 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
 
         /* Scrollbar styling for webkit browsers */
         .scrollbar-thin::-webkit-scrollbar {
-          height: 6px;
+          height: 5px;
         }
 
         .scrollbar-thumb-zinc-300::-webkit-scrollbar-thumb {
-          background-color: rgba(212, 212, 216, 0.5);
+          background-color: rgba(212, 212, 216, 0.4);
           border-radius: 9999px;
         }
 
         .dark .scrollbar-thumb-zinc-700::-webkit-scrollbar-thumb {
-          background-color: rgba(63, 63, 70, 0.5);
+          background-color: rgba(63, 63, 70, 0.4);
         }
 
         .scrollbar-track-transparent::-webkit-scrollbar-track {
           background-color: transparent;
         }
 
-        /* Add scroll indicator */
+        /* Simplify scroll indicator */
         .timeline-container::after {
           content: "";
           position: absolute;
           top: 10px;
           right: 10px;
-          width: 24px;
-          height: 24px;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='rgba(161, 161, 170, 0.7)' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
+          width: 20px;
+          height: 20px;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='rgba(161, 161, 170, 0.5)' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
           background-size: contain;
           background-repeat: no-repeat;
-          opacity: 0.5;
+          opacity: 0.4;
           pointer-events: none;
         }
       `}</style>
