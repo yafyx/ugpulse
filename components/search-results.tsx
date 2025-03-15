@@ -1,5 +1,4 @@
 import React from "react";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Button, Spinner } from "@nextui-org/react";
 import JadwalTable from "@/components/jadwal-table";
 import MahasiswaTable from "@/components/mahasiswa-table";
@@ -59,37 +58,28 @@ export default function SearchResults({
           <div
             className={`w-full ${selectedOptionsCount > 1 ? "md:w-[calc(50%-12px)]" : ""} transition-all duration-300`}
           >
-            <Card className="h-full border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
-              <CardHeader className="border-b border-zinc-200/30 px-5 py-4 dark:border-zinc-700/30">
-                <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
-                  Jadwal Kelas
-                </h3>
-              </CardHeader>
-              <CardBody className="p-4">
-                {jadwalError ? (
-                  <div className="flex flex-col items-center justify-center p-4 text-center">
-                    <p className="text-red-500">Failed to load jadwal data</p>
-                    <Button
-                      size="sm"
-                      className="mt-2 bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
-                      onClick={() => window.location.reload()}
-                    >
-                      Coba Lagi
-                    </Button>
-                  </div>
-                ) : isJadwalLoading ? (
-                  <div className="flex items-center justify-center p-8">
-                    <Spinner color="default" label="Memuat data jadwal..." />
-                  </div>
-                ) : jadwalData?.data?.jadwal ? (
-                  <JadwalTable jadwal={jadwalData.data.jadwal} kelas={kelas} />
-                ) : (
-                  <p className="p-4 text-center text-zinc-500 dark:text-zinc-400">
-                    Tidak ada data jadwal ditemukan
-                  </p>
-                )}
-              </CardBody>
-            </Card>
+            {jadwalError ? (
+              <div className="flex flex-col items-center justify-center p-4 text-center">
+                <p className="text-red-500">Failed to load jadwal data</p>
+                <Button
+                  size="sm"
+                  className="mt-2 bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
+                  onClick={() => window.location.reload()}
+                >
+                  Coba Lagi
+                </Button>
+              </div>
+            ) : isJadwalLoading ? (
+              <div className="flex items-center justify-center p-8">
+                <Spinner color="default" label="Memuat data jadwal..." />
+              </div>
+            ) : jadwalData?.data?.jadwal ? (
+              <JadwalTable jadwal={jadwalData.data.jadwal} kelas={kelas} />
+            ) : (
+              <p className="p-4 text-center text-zinc-500 dark:text-zinc-400">
+                Tidak ada data jadwal ditemukan
+              </p>
+            )}
           </div>
         )}
 
@@ -97,13 +87,13 @@ export default function SearchResults({
           <div
             className={`w-full ${selectedOptionsCount > 1 ? "md:w-[calc(50%-12px)]" : ""} transition-all duration-300`}
           >
-            <Card className="h-full border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
-              <CardHeader className="border-b border-zinc-200/30 px-5 py-4 dark:border-zinc-700/30">
+            <div className="h-full rounded-lg border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+              <div className="border-b border-zinc-200/30 px-5 py-4 dark:border-zinc-700/30">
                 <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
                   Kelas Baru
                 </h3>
-              </CardHeader>
-              <CardBody className="p-4">
+              </div>
+              <div className="p-4">
                 {kelasBaruError ? (
                   <div className="flex flex-col items-center justify-center p-4 text-center">
                     <p className="text-red-500">
@@ -131,8 +121,8 @@ export default function SearchResults({
                     Tidak ada data kelas baru ditemukan
                   </p>
                 )}
-              </CardBody>
-            </Card>
+              </div>
+            </div>
           </div>
         )}
 
@@ -140,13 +130,13 @@ export default function SearchResults({
           <div
             className={`w-full ${selectedOptionsCount > 1 ? "md:w-[calc(50%-12px)]" : ""} transition-all duration-300`}
           >
-            <Card className="h-full border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
-              <CardHeader className="border-b border-zinc-200/30 px-5 py-4 dark:border-zinc-700/30">
+            <div className="h-full rounded-lg border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+              <div className="border-b border-zinc-200/30 px-5 py-4 dark:border-zinc-700/30">
                 <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
                   Mahasiswa Baru
                 </h3>
-              </CardHeader>
-              <CardBody className="p-4">
+              </div>
+              <div className="p-4">
                 {mahasiswaBaruError ? (
                   <div className="flex flex-col items-center justify-center p-4 text-center">
                     <p className="text-red-500">
@@ -177,8 +167,8 @@ export default function SearchResults({
                     Tidak ada data mahasiswa baru ditemukan
                   </p>
                 )}
-              </CardBody>
-            </Card>
+              </div>
+            </div>
           </div>
         )}
       </div>
