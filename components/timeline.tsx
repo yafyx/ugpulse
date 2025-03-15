@@ -490,7 +490,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
             <div className="relative flex min-w-max flex-col" ref={timelineRef}>
               <div className="relative flex min-w-max flex-col">
                 <div className="pointer-events-none absolute bottom-0 left-0 right-0 top-28">
-                  <div className="h-full w-full bg-[linear-gradient(to_right,transparent_39px,rgba(161,161,170,0.03)_39px,rgba(161,161,170,0.03)_40px,transparent_40px)] bg-[length:40px_100%] bg-repeat-x"></div>
+                  <div className="h-full w-full bg-[linear-gradient(to_right,transparent_19px,rgba(161,161,170,0.15)_19px,rgba(161,161,170,0.15)_20px,transparent_20px)] bg-[length:40px_100%] bg-repeat-x dark:bg-[linear-gradient(to_right,transparent_19px,rgba(161,161,170,0.15)_19px,rgba(161,161,170,0.15)_20px,transparent_20px)]"></div>
                 </div>
                 <div className="sticky top-0 z-10 flex items-center bg-white/95 p-2 shadow-sm dark:bg-zinc-900/95 dark:text-white">
                   {Object.keys(months).map((monthKey, monthIdx) => (
