@@ -52,10 +52,9 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="mb-10">
-      <Card className="overflow-hidden border-none bg-gradient-to-br from-white/90 to-white/70 shadow-xl backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
+      <Card className="overflow-hidden border-none bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
         <CardBody className="p-0">
           <div className="flex flex-col">
-            {/* Header Section */}
             <div className="bg-gradient-to-r from-zinc-100/90 to-zinc-50/80 p-6 dark:from-zinc-800/90 dark:to-zinc-700/80">
               <h3 className="mb-1 text-lg font-medium text-zinc-800 dark:text-zinc-100">
                 Cari Informasi
@@ -65,7 +64,6 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
               </p>
             </div>
 
-            {/* Form Fields */}
             <div className="p-6">
               <div className="space-y-6">
                 <Input
