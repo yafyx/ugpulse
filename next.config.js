@@ -8,12 +8,13 @@ const withPWA = require("next-pwa")({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["nextui.org"],
+    domains: ["nextui.org", "studentsite.gunadarma.ac.id"],
   },
   experimental: {
     turbo: {
       enabled: true,
     },
+    serverComponentsExternalPackages: ["cheerio"],
   },
 };
 

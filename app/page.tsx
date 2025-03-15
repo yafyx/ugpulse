@@ -13,6 +13,7 @@ import useSWR from "swr";
 import Timeline from "@/components/timeline";
 import JadwalTable from "@/components/jadwal-table";
 import MahasiswaTable from "@/components/mahasiswa-table";
+import NewsSection from "@/components/news-section";
 
 interface Event {
   kegiatan: string;
@@ -445,6 +446,10 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* <section aria-label="Berita Terkini" className="mb-10">
+        <NewsSection />
+      </section> */}
 
       <section aria-label="Kalender Akademik" className="mb-10">
         <Card className="border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
