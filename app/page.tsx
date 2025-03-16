@@ -1,8 +1,15 @@
 "use client";
 import React, { useState, useCallback } from "react";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Button, Spinner, CheckboxGroup, Checkbox } from "@heroui/react";
-import { Skeleton } from "@heroui/skeleton";
+import { Card, CardBody, CardHeader, CardFooter } from "@heroui/card";
+import {
+  Button,
+  Spinner,
+  CheckboxGroup,
+  Checkbox,
+  Skeleton,
+  Chip,
+  Divider,
+} from "@heroui/react";
 import useSWR from "swr";
 import Timeline from "@/components/timeline";
 import SearchForm from "@/components/search-form";
@@ -132,9 +139,9 @@ export default function Home() {
 
   if (eventsError) {
     return (
-      <div className="flex min-h-[50vh] w-full flex-col items-center justify-center rounded-xl">
+      <div className="flex min-h-[50vh] w-full flex-col items-center justify-center rounded-xl p-4">
         <Card className="max-w-md border-none bg-gradient-to-br from-white/90 to-white/70 shadow-xl backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
-          <CardBody className="p-6">
+          <CardHeader className="border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
             <div className="flex items-center gap-3 text-red-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -152,38 +159,36 @@ export default function Home() {
               </svg>
               <h1 className="text-xl font-bold">Error</h1>
             </div>
-            <p className="mt-3 text-zinc-700 dark:text-zinc-300">
+          </CardHeader>
+          <CardBody className="p-6">
+            <p className="text-zinc-700 dark:text-zinc-300">
               Failed to load calendar data. Please try again later.
             </p>
+          </CardBody>
+          <CardFooter className="border-t border-zinc-100 px-6 py-4 dark:border-zinc-800">
             <Button
-              className="mt-4 bg-gradient-to-r from-zinc-800 to-zinc-700 text-white hover:from-zinc-900 hover:to-zinc-800 dark:from-zinc-700 dark:to-zinc-600 dark:hover:from-zinc-600 dark:hover:to-zinc-500"
+              color="primary"
+              variant="shadow"
               onClick={() => window.location.reload()}
               radius="sm"
+              className="w-full"
             >
               Refresh Page
             </Button>
-          </CardBody>
+          </CardFooter>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto max-w-6xl">
-      <section aria-label="Search Form" className="mb-10">
-        <SearchForm
-          onSubmit={(kelasValue, selectedOptionsValue) => {
-            setKelas(kelasValue);
-            setSelectedOptions(selectedOptionsValue);
-            setShowKelasData(true);
-            setIsLoading(true);
-          }}
-          isLoading={isLoading}
-        />
+    <div className="container mx-auto max-w-6xl px-4 py-6 sm:px-6">
+      <section aria-label="Search Form" className="mb-12 w-full">
+        <SearchForm onSubmit={handleSearchSubmit} isLoading={isLoading} />
       </section>
 
       {showKelasData && (
-        <section aria-label="Search Results" className="mb-10">
+        <section aria-label="Search Results" className="mb-12">
           <SearchResults
             selectedOptions={selectedOptions}
             kelas={kelas}
@@ -200,47 +205,80 @@ export default function Home() {
         </section>
       )}
 
-      {/* <section aria-label="Berita Terkini" className="mb-10">
+      {/* <section aria-label="Berita Terkini" className="mb-12">
         <NewsSection />
       </section> */}
 
-      <section aria-label="Kalender Akademik" className="mb-12 px-4 sm:px-6">
+      <section aria-label="Kalender Akademik" className="mb-12">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100">
             Timeline Akademik
           </h2>
           <div className="mx-4 h-1 flex-1 rounded-full bg-gradient-to-r from-zinc-300/80 to-transparent dark:from-zinc-700/80"></div>
+          <Chip color="primary" variant="dot" className="font-medium">
+            Terbaru
+          </Chip>
         </div>
 
         {isEventsLoading ? (
-          <Card className="border-none bg-gradient-to-br from-white/90 to-white/70 shadow-xl backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
-            <CardBody className="flex items-center justify-center p-8">
-              <Spinner
-                color="default"
-                size="lg"
-                classNames={{
-                  circle1: "border-zinc-300 dark:border-zinc-700",
-                  circle2: "border-zinc-600 dark:border-zinc-400",
-                }}
-              >
-                <span className="ml-2 text-zinc-700 dark:text-zinc-300">
-                  Memuat kalender akademik...
-                </span>
-              </Spinner>
-            </CardBody>
-          </Card>
-        ) : eventsData && eventsData.data ? (
-          <div>
-            <Timeline events={eventsData.data} />
+          <div className="rounded-xl bg-gradient-to-br from-white/90 to-white/70 p-6 shadow-lg backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              </div>
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-3/4" />
+              <Divider className="my-4" />
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              </div>
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-3/4" />
+            </div>
           </div>
+        ) : eventsData && eventsData.data ? (
+          <Timeline events={eventsData.data} />
         ) : (
-          <Card className="border-none bg-gradient-to-br from-white/90 to-white/70 shadow-xl backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
-            <CardBody className="p-6">
-              <p className="text-center text-zinc-500 dark:text-zinc-400">
+          <div className="flex h-64 items-center justify-center rounded-xl bg-gradient-to-br from-white/90 to-white/70 p-6 shadow-lg backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
+            <div className="text-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="mx-auto h-12 w-12 text-zinc-400"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <p className="mt-4 text-zinc-500 dark:text-zinc-400">
                 Tidak ada data kalender ditemukan
               </p>
-            </CardBody>
-          </Card>
+              <Button
+                variant="flat"
+                color="default"
+                size="sm"
+                className="mt-4"
+                onClick={() => window.location.reload()}
+              >
+                Refresh
+              </Button>
+            </div>
+          </div>
         )}
       </section>
     </div>

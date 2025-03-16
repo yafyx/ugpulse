@@ -656,7 +656,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     onMouseEnter={() => setIsHoveringMarker(true)}
                     onMouseLeave={() => setIsHoveringMarker(false)}
                   >
-                    <div className="absolute left-1/2 top-[-30px] -translate-x-1/2 whitespace-nowrap rounded-xl border border-zinc-300/20 bg-zinc-800 px-2 py-1 text-sm font-medium text-white shadow-sm dark:border-zinc-600/20 dark:bg-zinc-300 dark:text-zinc-900">
+                    <div className="absolute left-1/2 top-[-20px] -translate-x-1/2 whitespace-nowrap rounded-xl border border-zinc-300/20 bg-zinc-800 px-2 py-[0.5px] text-sm font-medium text-white shadow-sm dark:border-zinc-600/20 dark:bg-zinc-300 dark:text-zinc-900">
                       {format(currentTime, "HH:mm:ss")}
                     </div>
                   </div>
