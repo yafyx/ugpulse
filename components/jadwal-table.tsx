@@ -42,24 +42,6 @@ interface JadwalTableProps {
   kelas: string;
 }
 
-const CSVExport = ({
-  data,
-  filename,
-  children,
-}: {
-  data: any[];
-  filename: string;
-  children: React.ReactNode;
-}) => (
-  <CSVLink
-    data={data}
-    filename={filename}
-    style={{ textDecoration: "none", color: "inherit" }}
-  >
-    {children}
-  </CSVLink>
-);
-
 const JadwalTable: React.FC<JadwalTableProps> = ({ jadwal, kelas }) => {
   const columns = ["Hari", "Mata Kuliah", "Jam", "Ruang", "Dosen"];
 
@@ -106,9 +88,28 @@ const JadwalTable: React.FC<JadwalTableProps> = ({ jadwal, kelas }) => {
             </DropdownTrigger>
             <DropdownMenu variant="faded">
               <DropdownItem key="csv" description="Ekspor jadwal ke file CSV">
-                <CSVExport data={csvData} filename={`${exportFileName}.csv`}>
+                <a
+                  href="#"
+                  style={{ textDecoration: "none", color: "inherit" }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const csvInstance = document.getElementById("csv-download");
+                    if (csvInstance) {
+                      csvInstance.click();
+                    }
+                  }}
+                >
                   Export to CSV
-                </CSVExport>
+                </a>
+                <div className="hidden">
+                  <CSVLink
+                    id="csv-download"
+                    data={csvData}
+                    filename={`${exportFileName}.csv`}
+                  >
+                    Download
+                  </CSVLink>
+                </div>
               </DropdownItem>
               <DropdownItem
                 key="pdf"

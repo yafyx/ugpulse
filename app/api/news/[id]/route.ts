@@ -4,11 +4,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BASE_URL = "https://studentsite.gunadarma.ac.id";
 
+type RouteContext = {
+    params: Promise<{ id: string }>;
+};
+
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    context: RouteContext
 ) {
     try {
+        const params = await context.params;
         const id = params.id;
         const url = `${BASE_URL}/index.php/site/berita/${id}`;
 
