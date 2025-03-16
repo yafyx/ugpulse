@@ -1,6 +1,6 @@
 {
   "name": "ugcnn",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -38,7 +38,6 @@
     "jspdf": "^3.0.0",
     "jspdf-autotable": "^5.0.2",
     "next": "^15.2.2",
-    "next-pwa": "^5.6.0",
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
     "react-csv": "^2.2.2",

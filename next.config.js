@@ -1,12 +1,3 @@
-import nextPWA from "next-pwa";
-
-const withPWA = nextPWA({
-  dest: "public",
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === "development",
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -18,6 +9,9 @@ const nextConfig = {
       enabled: true,
     },
   },
+  env: {
+    VAR_ORIGINAL_PATHNAME: "/",
+  },
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;

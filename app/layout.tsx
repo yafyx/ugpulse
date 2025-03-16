@@ -14,25 +14,8 @@ export const metadata: Metadata = {
     template: `%s - ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
-    apple: [
-      { url: "/icons/icon-192x192.png" },
-      { url: "/icons/icon-512x512.png" },
-    ],
-  },
-  applicationName: "UG Connect",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "UGC",
-  },
-  formatDetection: {
-    telephone: false,
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 };
 
