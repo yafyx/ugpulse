@@ -9,7 +9,6 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-  Tooltip,
   Button,
 } from "@heroui/react";
 import {
@@ -387,17 +386,14 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
     currentDate = addDays(currentDate, 1);
   }
 
-  const months = allDates.reduce(
-    (acc, date) => {
-      const monthKey = format(date, "yyyy-MM");
-      if (!acc[monthKey]) {
-        acc[monthKey] = [];
-      }
-      acc[monthKey].push(date);
-      return acc;
-    },
-    {} as { [key: string]: Date[] },
-  );
+  const months = allDates.reduce<{ [key: string]: Date[] }>((acc, date) => {
+    const monthKey = format(date, "yyyy-MM");
+    if (!acc[monthKey]) {
+      acc[monthKey] = [];
+    }
+    acc[monthKey].push(date);
+    return acc;
+  }, {});
 
   const currentTimePosition = (() => {
     const diffInSeconds = differenceInSeconds(currentTime, displayStartDate);
@@ -527,7 +523,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                         </h3>
                       </div>
                       <div className="flex">
-                        {months[monthKey].map((date, index) => (
+                        {months[monthKey].map((date: Date, index: number) => (
                           <div
                             key={`${monthKey}-${index}`}
                             className="w-10 text-sm font-medium text-zinc-500 dark:text-zinc-400"
@@ -540,32 +536,34 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                   ))}
                 </div>
                 <div className="flex items-start dark:text-white">
-                  {Object.values(months).map((dates, monthIndex) => (
-                    <div
-                      key={monthIndex}
-                      className="flex flex-wrap"
-                      style={{ width: `${dates.length * 40}px` }}
-                    >
-                      {dates.map((date, dateIndex) => {
-                        const isToday = isSameDay(date, new Date());
-                        return (
-                          <div
-                            key={dateIndex}
-                            className={`flex w-10 flex-col items-center ${isToday ? "relative" : ""}`}
-                          >
+                  {(Object.values(months) as Date[][]).map(
+                    (dates: Date[], monthIndex) => (
+                      <div
+                        key={monthIndex}
+                        className="flex flex-wrap"
+                        style={{ width: `${dates.length * 40}px` }}
+                      >
+                        {dates.map((date: Date, dateIndex: number) => {
+                          const isToday = isSameDay(date, new Date());
+                          return (
                             <div
-                              className={`flex items-center justify-center font-semibold ${isToday ? "h-6 w-6 rounded-full bg-zinc-800 text-white shadow-md dark:bg-zinc-200 dark:text-black" : "text-zinc-700 dark:text-zinc-300"}`}
+                              key={dateIndex}
+                              className={`flex w-10 flex-col items-center ${isToday ? "relative" : ""}`}
                             >
-                              {format(date, "d")}
+                              <div
+                                className={`flex items-center justify-center font-semibold ${isToday ? "h-6 w-6 rounded-full bg-zinc-800 text-white shadow-md dark:bg-zinc-200 dark:text-black" : "text-zinc-700 dark:text-zinc-300"}`}
+                              >
+                                {format(date, "d")}
+                              </div>
+                              {isToday && (
+                                <div className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 transform rounded-full bg-zinc-500 dark:bg-zinc-400"></div>
+                              )}
                             </div>
-                            {isToday && (
-                              <div className="absolute -bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 transform rounded-full bg-zinc-500 dark:bg-zinc-400"></div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ))}
+                          );
+                        })}
+                      </div>
+                    ),
+                  )}
                 </div>
                 <div
                   className="relative mt-2 flex-grow dark:text-white"
@@ -648,7 +646,6 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     );
                   })}
 
-                  {/* Current time marker with simpler design */}
                   <div
                     className="current-time-marker absolute bottom-0 top-[-40px] z-20 w-[2px] cursor-default bg-zinc-800 transition-all duration-300 dark:bg-zinc-300"
                     style={{
@@ -659,10 +656,9 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                     onMouseEnter={() => setIsHoveringMarker(true)}
                     onMouseLeave={() => setIsHoveringMarker(false)}
                   >
-                    <div className="absolute left-[-40px] top-[-30px] rounded-xl border border-zinc-300/20 bg-zinc-800 px-3 py-1.5 text-xs text-white shadow-sm dark:border-zinc-600/20 dark:bg-zinc-800">
+                    <div className="absolute left-1/2 top-[-30px] -translate-x-1/2 whitespace-nowrap rounded-xl border border-zinc-300/20 bg-zinc-800 px-2 py-1 text-sm font-medium text-white shadow-sm dark:border-zinc-600/20 dark:bg-zinc-300 dark:text-zinc-900">
                       {format(currentTime, "HH:mm:ss")}
                     </div>
-                    <div className="absolute left-[-4px] top-[-10px] h-4 w-4 rounded-full border-2 border-zinc-800 bg-white shadow-sm dark:border-zinc-300 dark:bg-zinc-900"></div>
                   </div>
                 </div>
               </div>
@@ -671,7 +667,6 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
         </CardBody>
       </Card>
 
-      {/* Simplified modal design */}
       <Modal
         placement="center"
         hideCloseButton={false}
