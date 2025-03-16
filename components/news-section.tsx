@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Card, CardBody, CardHeader, CardFooter } from "@nextui-org/card";
+import { Card, CardBody, CardHeader, CardFooter } from "@heroui/card";
 import {
   Button,
   Modal,
@@ -9,7 +9,7 @@ import {
   ModalHeader,
   ModalFooter,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import useSWR from "swr";
 
 interface NewsItem {
@@ -142,7 +142,6 @@ export default function NewsSection() {
           )}
         </CardBody>
       </Card>
-
       {/* News Detail Modal */}
       <Modal isOpen={isModalOpen} onClose={closeModal} size="3xl">
         <ModalContent>

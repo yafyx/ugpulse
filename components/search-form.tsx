@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Card, CardBody } from "@nextui-org/card";
+import { Card, CardBody } from "@heroui/card";
 import {
   Button,
   Input,
@@ -8,7 +8,7 @@ import {
   Divider,
   Tooltip,
   Chip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { motion } from "framer-motion";
 
 interface SearchFormProps {

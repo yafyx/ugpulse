@@ -15,8 +15,8 @@ import {
   DropdownItem,
   Pagination,
   SortDescriptor,
-} from "@nextui-org/react";
-import { Card, CardHeader, CardBody } from "@nextui-org/card";
+} from "@heroui/react";
+import { Card, CardHeader, CardBody } from "@heroui/card";
 import { SearchIcon } from "@/components/SearchIcon";
 import { ChevronDownIcon } from "@/components/ChevronDownIcon";
 import { capitalize } from "@/config/utils";

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Card, CardBody } from "@nextui-org/card";
-import { Chip } from "@nextui-org/chip";
-import { Link } from "@nextui-org/link";
+import { Card, CardBody } from "@heroui/card";
+import { Chip } from "@heroui/chip";
+import { Link } from "@heroui/link";
 import {
   Modal,
   ModalContent,
@@ -11,7 +11,7 @@ import {
   useDisclosure,
   Tooltip,
   Button,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   parseISO,
   differenceInDays,

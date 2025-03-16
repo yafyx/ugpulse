@@ -76,10 +76,7 @@ export default function RootLayout({
               className="mt-12 w-full border-t border-zinc-200/20 bg-white/60 py-6 backdrop-blur-md dark:border-zinc-700/30 dark:bg-zinc-900/60"
               aria-label="Footer"
             >
-              <div className="container mx-auto flex flex-col items-center justify-between space-y-3 px-4 sm:flex-row sm:space-y-0 sm:px-6 lg:px-8">
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  © {new Date().getFullYear()} UG Connect
-                </p>
+              <div className="container mx-auto flex flex-col items-center justify-center space-y-3 px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center space-x-4">
                   Made with ❤️ by yfyx
                 </div>

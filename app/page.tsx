@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useCallback } from "react";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
-import { Button, Spinner, CheckboxGroup, Checkbox } from "@nextui-org/react";
-import { Skeleton } from "@nextui-org/skeleton";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Button, Spinner, CheckboxGroup, Checkbox } from "@heroui/react";
+import { Skeleton } from "@heroui/skeleton";
 import useSWR from "swr";
 import Timeline from "@/components/timeline";
 import SearchForm from "@/components/search-form";
@@ -169,34 +169,35 @@ export default function Home() {
   }
 
   return (
-    <div className="flex w-full flex-col">
-      <div className="mx-auto w-full max-w-4xl px-4 sm:px-6">
-        <div className="mb-8 text-center">
-          <h1 className="bg-gradient-to-r from-zinc-900 to-zinc-700 bg-clip-text text-4xl font-bold text-transparent dark:from-zinc-100 dark:to-zinc-400 sm:text-5xl md:text-6xl">
-            UG Connect
-          </h1>
-          <p className="mt-4 text-lg text-zinc-700 dark:text-zinc-300">
-            Cari jadwal kelas, informasi mahasiswa, dan kelas baru
-          </p>
-        </div>
-
-        <SearchForm onSubmit={handleSearchSubmit} isLoading={isLoading} />
-      </div>
+    <div className="container mx-auto max-w-6xl">
+      <section aria-label="Search Form" className="mb-10">
+        <SearchForm
+          onSubmit={(kelasValue, selectedOptionsValue) => {
+            setKelas(kelasValue);
+            setSelectedOptions(selectedOptionsValue);
+            setShowKelasData(true);
+            setIsLoading(true);
+          }}
+          isLoading={isLoading}
+        />
+      </section>
 
       {showKelasData && (
-        <SearchResults
-          selectedOptions={selectedOptions}
-          kelas={kelas}
-          jadwalData={jadwalData}
-          kelasBaruData={kelasBaruData}
-          mahasiswaBaruData={mahasiswaBaruData}
-          isJadwalLoading={isJadwalLoading}
-          isKelasBaruLoading={isKelasBaruLoading}
-          isMahasiswaBaruLoading={isMahasiswaBaruLoading}
-          jadwalError={jadwalError}
-          kelasBaruError={kelasBaruError}
-          mahasiswaBaruError={mahasiswaBaruError}
-        />
+        <section aria-label="Search Results" className="mb-10">
+          <SearchResults
+            selectedOptions={selectedOptions}
+            kelas={kelas}
+            jadwalData={jadwalData}
+            kelasBaruData={kelasBaruData}
+            mahasiswaBaruData={mahasiswaBaruData}
+            isJadwalLoading={isJadwalLoading}
+            isKelasBaruLoading={isKelasBaruLoading}
+            isMahasiswaBaruLoading={isMahasiswaBaruLoading}
+            jadwalError={jadwalError}
+            kelasBaruError={kelasBaruError}
+            mahasiswaBaruError={mahasiswaBaruError}
+          />
+        </section>
       )}
 
       {/* <section aria-label="Berita Terkini" className="mb-10">
@@ -228,8 +229,10 @@ export default function Home() {
               </Spinner>
             </CardBody>
           </Card>
-        ) : eventsData ? (
-          <Timeline events={eventsData.data} />
+        ) : eventsData && eventsData.data ? (
+          <div>
+            <Timeline events={eventsData.data} />
+          </div>
         ) : (
           <Card className="border-none bg-gradient-to-br from-white/90 to-white/70 shadow-xl backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
             <CardBody className="p-6">

@@ -2,7 +2,7 @@
 import React from "react";
 import useSWR from "swr";
 import Timeline from "@/components/timeline";
-import { Spinner } from "@nextui-org/react";
+import { Spinner } from "@heroui/react";
 
 interface Event {
   kegiatan: string;

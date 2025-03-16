@@ -1,4 +1,6 @@
-const withPWA = require("next-pwa")({
+import nextPWA from "next-pwa";
+
+const withPWA = nextPWA({
   dest: "public",
   register: true,
   skipWaiting: true,
@@ -10,12 +12,12 @@ const nextConfig = {
   images: {
     domains: ["nextui.org", "studentsite.gunadarma.ac.id"],
   },
+  serverExternalPackages: ["cheerio"],
   experimental: {
     turbo: {
       enabled: true,
     },
-    serverComponentsExternalPackages: ["cheerio"],
   },
 };
 
-module.exports = withPWA(nextConfig);
+export default withPWA(nextConfig);

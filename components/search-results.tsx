@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Spinner } from "@nextui-org/react";
+import { Button, Spinner } from "@heroui/react";
 import JadwalTable from "@/components/jadwal-table";
 import MahasiswaTable from "@/components/mahasiswa-table";
 
