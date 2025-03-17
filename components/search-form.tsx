@@ -84,27 +84,17 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
 
   return (
     <div className="search-form-container w-full">
-      <Card className="overflow-hidden border border-zinc-200/20 bg-white/90 shadow-md dark:border-zinc-700/30 dark:bg-zinc-900/90">
+      <Card className="w-full overflow-hidden border border-zinc-200/20 bg-white/90 shadow-lg backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-900/90">
         <CardBody className="p-0">
-          <div className="flex items-center justify-between border-b border-zinc-200/30 p-4 dark:border-zinc-700/30">
-            <div>
-              <h3 className="bg-gradient-to-b from-purple-800 to-purple-400 bg-clip-text text-lg font-semibold text-transparent">
-                Cari Informasi
-              </h3>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Masukkan NPM, nama, atau kelas untuk mencari data
-              </p>
-            </div>
-            <div>
-              <Button
-                size="sm"
-                variant="flat"
-                className="bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
-                onClick={handleClear}
-              >
-                Reset
-              </Button>
-            </div>
+          <div className="flex w-full justify-end border-b border-zinc-200/30 p-4 dark:border-zinc-700/30">
+            <Button
+              size="sm"
+              variant="flat"
+              className="w-24 bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
+              onClick={handleClear}
+            >
+              Reset
+            </Button>
           </div>
 
           <Form
@@ -114,7 +104,7 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
             aria-label="Search Form"
             validationBehavior="aria"
           >
-            <div className="space-y-4 p-4">
+            <div className="w-full space-y-6 p-4 sm:p-6">
               <Input
                 type="search"
                 label="Kata Kunci Pencarian"
@@ -150,9 +140,10 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
                   </svg>
                 }
                 classNames={{
-                  label: "text-zinc-700 dark:text-zinc-300 font-medium",
-                  description: "text-zinc-500 text-xs mt-1",
+                  base: "w-full",
+                  mainWrapper: "w-full",
                   inputWrapper: [
+                    "w-full",
                     "bg-white/30 dark:bg-zinc-800/30",
                     "border-zinc-200/50 dark:border-zinc-700/50",
                     "hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50",
@@ -161,20 +152,25 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
                     "!cursor-text",
                     "transition-all duration-200",
                   ],
-                  input:
-                    "text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-500",
-                  innerWrapper: "flex gap-2",
+                  input: [
+                    "w-full",
+                    "text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-500 text-sm sm:text-base",
+                  ],
+                  innerWrapper: "flex w-full gap-2",
+                  label:
+                    "text-zinc-700 dark:text-zinc-300 font-medium text-sm sm:text-base",
+                  description: "text-zinc-500 text-xs sm:text-sm mt-1",
                   clearButton: "text-zinc-500 hover:text-purple-400",
-                  errorMessage: "text-danger text-xs mt-1",
-                  helperWrapper: "flex flex-col mt-1.5",
+                  errorMessage: "text-danger text-xs sm:text-sm mt-1",
+                  helperWrapper: "flex flex-col mt-1.5 w-full",
                 }}
               />
 
-              <div className="rounded-lg bg-zinc-100/50 p-3 dark:bg-zinc-800/30">
-                <div className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
+              <div className="rounded-lg bg-zinc-100/50 p-3 dark:bg-zinc-800/30 sm:p-4">
+                <div className="flex items-start gap-2 text-xs text-zinc-600 dark:text-zinc-400 sm:text-sm">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 flex-shrink-0 text-purple-400"
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-purple-400"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -195,9 +191,9 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
 
               <Divider className="my-2 bg-zinc-200/50 dark:bg-zinc-700/50" />
 
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <h4 className="font-medium text-zinc-700 dark:text-zinc-300">
+              <div className="w-full space-y-3">
+                <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+                  <h4 className="text-sm font-medium text-zinc-700 dark:text-zinc-300 sm:text-base">
                     Pilih Kategori Pencarian
                   </h4>
                   {validationErrors.options && (
@@ -213,7 +209,8 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
                   name="searchOptions"
                   aria-label="Opsi pencarian"
                   classNames={{
-                    wrapper: "grid grid-cols-1 sm:grid-cols-3 gap-2 w-full",
+                    wrapper:
+                      "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full",
                   }}
                   isRequired
                   errorMessage={validationErrors.options}
@@ -333,7 +330,8 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
                   isDisabled={!kelas.trim() || selectedOptions.length === 0}
                   radius="lg"
                   variant="shadow"
-                  className="w-full font-medium"
+                  className="w-full text-sm font-medium sm:text-base"
+                  size="lg"
                   startContent={
                     !isLoading && (
                       <svg
@@ -358,7 +356,7 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
             </div>
           </Form>
 
-          <div className="border-t border-zinc-200/30 px-4 py-3 text-xs text-zinc-500 dark:border-zinc-700/30">
+          <div className="border-t border-zinc-200/30 px-4 py-3 text-xs text-zinc-500 dark:border-zinc-700/30 sm:text-sm">
             Cari informasi akademik terbaru dengan mudah
           </div>
         </CardBody>

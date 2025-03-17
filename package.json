@@ -1,6 +1,6 @@
 {
-  "name": "ugcnn",
-  "version": "1.0.1",
+  "name": "ugpulse",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -18,7 +18,7 @@
     "@heroui/link": "^2.2.13",
     "@heroui/listbox": "^2.3.15",
     "@heroui/navbar": "^2.2.14",
-    "@heroui/react": "^2.7.6-beta.2",
+    "@heroui/react": "^2.7.5",
     "@heroui/scroll-shadow": "^2.3.10",
     "@heroui/snippet": "^2.2.17",
     "@heroui/switch": "^2.2.14",

@@ -182,8 +182,15 @@ export default function Home() {
   }
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-6 sm:px-6">
+    <div className="container mx-auto w-full px-4 py-6 sm:px-6">
       <section aria-label="Search Form" className="mb-12 w-full">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold sm:text-3xl">UG Pulse</h2>
+          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
+            Masukkan NPM, nama, atau kelas untuk mencari data akademik yang kamu
+            butuhkan
+          </p>
+        </div>
         <SearchForm onSubmit={handleSearchSubmit} isLoading={isLoading} />
       </section>
 
@@ -214,7 +221,6 @@ export default function Home() {
           <h2 className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100">
             Timeline Akademik
           </h2>
-          <div className="mx-4 h-1 flex-1 rounded-full bg-gradient-to-r from-zinc-300/80 to-transparent dark:from-zinc-700/80"></div>
           <Chip color="primary" variant="dot" className="font-medium">
             Terbaru
           </Chip>

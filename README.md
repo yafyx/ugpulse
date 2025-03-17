@@ -1,8 +1,8 @@
-# UG Connect
+# UG Pulse
 
 ## Overview
 
-UG Connect is a web application designed to help manage university-related information, including student data, class schedules, and academic timelines. Built with Next.js and NextUI, it provides a modern, responsive interface.
+UG Pulse is a web application designed to help manage university-related information, including student data, class schedules, and academic timelines. Built with Next.js and NextUI, it provides a modern, responsive interface.
 
 ## Features
 
