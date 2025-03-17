@@ -777,21 +777,6 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
         .scrollbar-track-transparent::-webkit-scrollbar-track {
           background-color: transparent;
         }
-
-        /* Simplify scroll indicator */
-        .timeline-container::after {
-          content: "";
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          width: 20px;
-          height: 20px;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='rgba(161, 161, 170, 0.5)' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
-          background-size: contain;
-          background-repeat: no-repeat;
-          opacity: 0.4;
-          pointer-events: none;
-        }
       `}</style>
     </div>
   );
