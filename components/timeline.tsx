@@ -596,6 +596,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                           boxShadow: isActive
                             ? "0 0 10px rgba(0, 0, 0, 0.2)"
                             : "none",
+                          WebkitTapHighlightColor: "transparent",
                         }}
                         onClick={() => handleEventClick(event)}
                       >
@@ -774,6 +775,11 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
 
         .scrollbar-track-transparent::-webkit-scrollbar-track {
           background-color: transparent;
+        }
+
+        /* Disable mobile tap highlight */
+        * {
+          -webkit-tap-highlight-color: transparent;
         }
       `}</style>
     </div>
