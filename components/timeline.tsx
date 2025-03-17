@@ -550,9 +550,7 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
                               key={dateIndex}
                               className={`flex w-10 flex-col items-center ${isToday ? "relative" : ""}`}
                             >
-                              <div
-                                className={`flex items-center justify-center font-semibold ${isToday ? "h-6 w-6 rounded-full bg-zinc-800 text-white shadow-md dark:bg-zinc-200 dark:text-black" : "text-zinc-700 dark:text-zinc-300"}`}
-                              >
+                              <div className="flex items-center justify-center font-semibold text-zinc-700 dark:text-zinc-300">
                                 {format(date, "d")}
                               </div>
                               {isToday && (
