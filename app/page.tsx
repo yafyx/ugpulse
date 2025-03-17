@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, Suspense } from "react";
 import { Card, CardBody, CardHeader, CardFooter } from "@heroui/card";
 import {
   Button,
@@ -15,6 +15,7 @@ import Timeline from "@/components/timeline";
 import SearchForm from "@/components/search-form";
 import SearchResults from "@/components/search-results";
 import NewsSection from "@/components/news-section";
+import TimelineSkeleton from "@/components/timeline-skeleton";
 
 interface Event {
   kegiatan: string;
@@ -227,46 +228,11 @@ export default function Home() {
         </div>
 
         {isEventsLoading ? (
-          <div className="rounded-xl bg-gradient-to-br from-white/90 to-white/70 p-6 shadow-lg backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <Skeleton className="h-8 w-32 rounded-lg" />
-                <div className="flex space-x-2">
-                  <Skeleton className="h-8 w-20 rounded-full" />
-                  <Skeleton className="h-8 w-16 rounded-full" />
-                </div>
-              </div>
-
-              <div className="flex space-x-2 pt-2">
-                {[...Array(7)].map((_, i) => (
-                  <Skeleton key={i} className="h-6 w-10 rounded" />
-                ))}
-              </div>
-
-              <div className="flex space-x-2">
-                {[...Array(7)].map((_, i) => (
-                  <Skeleton key={i} className="h-6 w-6 rounded-full" />
-                ))}
-              </div>
-
-              <Divider className="my-2" />
-
-              <div className="relative">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="mt-3 flex items-center">
-                    <Skeleton className="h-8 w-32 rounded-full md:w-48" />
-                  </div>
-                ))}
-
-                <div className="absolute inset-y-0 left-1/4 w-0.5">
-                  <Skeleton className="h-full w-0.5" />
-                  <Skeleton className="absolute -top-2 h-5 w-16 -translate-x-1/2 rounded-full" />
-                </div>
-              </div>
-            </div>
-          </div>
+          <TimelineSkeleton />
         ) : eventsData && eventsData.data ? (
-          <Timeline events={eventsData.data} />
+          <Suspense fallback={<TimelineSkeleton />}>
+            <Timeline events={eventsData.data} />
+          </Suspense>
         ) : (
           <div className="flex h-64 items-center justify-center rounded-xl bg-gradient-to-br from-white/90 to-white/70 p-6 shadow-lg backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
             <div className="text-center">
