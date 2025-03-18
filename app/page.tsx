@@ -184,10 +184,10 @@ export default function Home() {
   }
 
   return (
-    <div className="container mx-auto w-full px-4 py-6 sm:px-6">
+    <div className="container mx-auto w-full px-4 sm:px-6">
       <section aria-label="Search Form" className="mb-12 w-full">
         <div className="mb-6">
-          <h2 className="mt-3 text-2xl tracking-tight text-zinc-800 dark:text-zinc-300 md:text-3xl">
+          <h2 className="text-2xl tracking-tight text-zinc-800 dark:text-zinc-300 md:text-3xl">
             Masukin NPM, nama, atau kelas buat nyari data akademik yang
             dibutuhkan
           </h2>
