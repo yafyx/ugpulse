@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Spinner } from "@heroui/react";
+import { Button } from "@heroui/react";
 import JadwalTable from "@/components/jadwal-table";
 import MahasiswaTable from "@/components/mahasiswa-table";
 
@@ -39,17 +39,32 @@ export default function SearchResults({
   jadwalData,
   kelasBaruData,
   mahasiswaBaruData,
-  isJadwalLoading,
-  isKelasBaruLoading,
-  isMahasiswaBaruLoading,
   jadwalError,
   kelasBaruError,
   mahasiswaBaruError,
 }: SearchResultsProps) {
   const selectedOptionsCount = selectedOptions.length;
 
+  // Check if any data is available to display
+  const hasJadwalData =
+    selectedOptions.includes("jadwal") && jadwalData?.data?.jadwal;
+  const hasKelasBaruData =
+    selectedOptions.includes("kelasBaru") && kelasBaruData?.data;
+  const hasMahasiswaBaruData =
+    selectedOptions.includes("mahasiswaBaru") && mahasiswaBaruData?.data;
+
+  // Check if there are any errors
+  const hasErrors = jadwalError || kelasBaruError || mahasiswaBaruError;
+
+  const shouldShowResults =
+    hasJadwalData || hasKelasBaruData || hasMahasiswaBaruData || hasErrors;
+
+  if (!shouldShowResults) {
+    return null;
+  }
+
   return (
-    <section aria-label="Hasil Pencarian" className="mb-12 px-4 sm:px-6">
+    <section aria-label="Hasil Pencarian" className="mb-12">
       <h2 className="mb-6 text-2xl font-semibold text-zinc-800 dark:text-zinc-100">
         Hasil Pencarian
       </h2>
@@ -68,10 +83,6 @@ export default function SearchResults({
                 >
                   Coba Lagi
                 </Button>
-              </div>
-            ) : isJadwalLoading ? (
-              <div className="flex items-center justify-center p-8">
-                <Spinner color="default" label="Memuat data jadwal..." />
               </div>
             ) : jadwalData?.data?.jadwal ? (
               <JadwalTable jadwal={jadwalData.data.jadwal} kelas={kelas} />
@@ -106,13 +117,6 @@ export default function SearchResults({
                     >
                       Coba Lagi
                     </Button>
-                  </div>
-                ) : isKelasBaruLoading ? (
-                  <div className="flex items-center justify-center p-8">
-                    <Spinner
-                      color="default"
-                      label="Memuat data kelas baru..."
-                    />
                   </div>
                 ) : kelasBaruData?.data ? (
                   <MahasiswaTable data={kelasBaruData.data} type="kelasBaru" />
@@ -149,13 +153,6 @@ export default function SearchResults({
                     >
                       Coba Lagi
                     </Button>
-                  </div>
-                ) : isMahasiswaBaruLoading ? (
-                  <div className="flex items-center justify-center p-8">
-                    <Spinner
-                      color="default"
-                      label="Memuat data mahasiswa baru..."
-                    />
                   </div>
                 ) : mahasiswaBaruData?.data ? (
                   <MahasiswaTable

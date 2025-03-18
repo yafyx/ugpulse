@@ -131,10 +131,10 @@ export default function Home() {
       setKelas(searchKelas);
       setSelectedOptions(searchOptions);
       setIsLoading(true);
-      setShowKelasData(true);
 
       await new Promise((resolve) => setTimeout(resolve, 500));
       setIsLoading(false);
+      setShowKelasData(true);
     },
     [],
   );
@@ -196,21 +196,19 @@ export default function Home() {
       </section>
 
       {showKelasData && (
-        <section aria-label="Search Results" className="mb-12">
-          <SearchResults
-            selectedOptions={selectedOptions}
-            kelas={kelas}
-            jadwalData={jadwalData}
-            kelasBaruData={kelasBaruData}
-            mahasiswaBaruData={mahasiswaBaruData}
-            isJadwalLoading={isJadwalLoading}
-            isKelasBaruLoading={isKelasBaruLoading}
-            isMahasiswaBaruLoading={isMahasiswaBaruLoading}
-            jadwalError={jadwalError}
-            kelasBaruError={kelasBaruError}
-            mahasiswaBaruError={mahasiswaBaruError}
-          />
-        </section>
+        <SearchResults
+          selectedOptions={selectedOptions}
+          kelas={kelas}
+          jadwalData={jadwalData}
+          kelasBaruData={kelasBaruData}
+          mahasiswaBaruData={mahasiswaBaruData}
+          isJadwalLoading={isJadwalLoading}
+          isKelasBaruLoading={isKelasBaruLoading}
+          isMahasiswaBaruLoading={isMahasiswaBaruLoading}
+          jadwalError={jadwalError}
+          kelasBaruError={kelasBaruError}
+          mahasiswaBaruError={mahasiswaBaruError}
+        />
       )}
 
       {/* <section aria-label="Berita Terkini" className="mb-12">

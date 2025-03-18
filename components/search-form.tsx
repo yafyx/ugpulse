@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Card, CardBody } from "@heroui/card";
 import {
   Button,
@@ -12,6 +12,8 @@ import {
 } from "@heroui/react";
 import { motion } from "framer-motion";
 import { Search, Info, Calendar, Users, User, Mail } from "lucide-react";
+import { IOSpinner } from "./IOSpinner";
+import CheckIcon from "./CheckIcon";
 
 interface SearchFormProps {
   onSubmit: (kelas: string, selectedOptions: string[]) => void;
@@ -24,6 +26,7 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
   >({});
+  const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
   const handleKelasChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,6 +61,17 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
     [kelas, selectedOptions, onSubmit],
   );
 
+  useEffect(() => {
+    if (!isLoading && showSuccess) {
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (isLoading && !showSuccess) {
+      setShowSuccess(true);
+    }
+  }, [isLoading, showSuccess]);
+
   const handleOptionsChange = useCallback(
     (values: string[]) => {
       if (values.includes("kelasBaru") && values.includes("mahasiswaBaru")) {
@@ -82,6 +96,26 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
   const handleClear = useCallback(() => {
     setKelas("");
   }, []);
+
+  const getButtonContent = () => {
+    if (isLoading) {
+      return "Memuat Data...";
+    } else if (!isLoading && showSuccess) {
+      return "Data Ditemukan";
+    } else {
+      return "Tampilkan Data";
+    }
+  };
+
+  const getStartContent = () => {
+    if (isLoading) {
+      return null;
+    } else if (!isLoading && showSuccess) {
+      return <CheckIcon />;
+    } else {
+      return <Search className="h-4 w-4" />;
+    }
+  };
 
   return (
     <div className="search-form-container w-full">
@@ -167,75 +201,79 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
                     </Chip>
                   )}
                 </div>
-                <CheckboxGroup
-                  orientation="horizontal"
-                  value={selectedOptions}
-                  onValueChange={handleOptionsChange}
-                  name="searchOptions"
-                  aria-label="Opsi pencarian"
-                  classNames={{
-                    wrapper: "flex flex-wrap gap-3 w-full",
-                    label: "flex items-center",
-                  }}
-                  isRequired
-                  errorMessage={validationErrors.options}
-                  isInvalid={!!validationErrors.options}
-                  color="secondary"
-                >
-                  <Checkbox
-                    value="jadwal"
-                    size="sm"
-                    color="secondary"
-                    className="min-w-[150px] flex-1"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-purple-500" />
-                      Jadwal Kelas
-                    </div>
-                  </Checkbox>
 
-                  <Checkbox
-                    value="kelasBaru"
-                    isDisabled={selectedOptions.includes("mahasiswaBaru")}
-                    size="sm"
-                    color="secondary"
-                    className="min-w-[150px] flex-1"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-purple-500" />
-                      Kelas Baru
-                    </div>
-                  </Checkbox>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                  <div className="flex-1">
+                    <CheckboxGroup
+                      orientation="horizontal"
+                      value={selectedOptions}
+                      onValueChange={handleOptionsChange}
+                      name="searchOptions"
+                      aria-label="Opsi pencarian"
+                      classNames={{
+                        wrapper: "flex flex-wrap gap-3 w-full",
+                        label: "flex items-center",
+                      }}
+                      isRequired
+                      errorMessage={validationErrors.options}
+                      isInvalid={!!validationErrors.options}
+                      color="secondary"
+                    >
+                      <Checkbox
+                        value="jadwal"
+                        size="sm"
+                        color="secondary"
+                        className="min-w-[150px] flex-1"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-purple-500" />
+                          Jadwal Kelas
+                        </div>
+                      </Checkbox>
 
-                  <Checkbox
-                    value="mahasiswaBaru"
-                    isDisabled={selectedOptions.includes("kelasBaru")}
-                    size="sm"
-                    color="secondary"
-                    className="min-w-[150px] flex-1"
-                  >
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-purple-500" />
-                      Mahasiswa Baru
-                    </div>
-                  </Checkbox>
-                </CheckboxGroup>
-              </div>
+                      <Checkbox
+                        value="kelasBaru"
+                        isDisabled={selectedOptions.includes("mahasiswaBaru")}
+                        size="sm"
+                        color="secondary"
+                        className="min-w-[150px] flex-1"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-purple-500" />
+                          Kelas Baru
+                        </div>
+                      </Checkbox>
 
-              <div className="border-t border-zinc-200/30 pt-4 dark:border-zinc-700/30">
-                <Button
-                  type="submit"
-                  color="secondary"
-                  isLoading={isLoading}
-                  isDisabled={!kelas.trim() || selectedOptions.length === 0}
-                  radius="lg"
-                  variant="shadow"
-                  className="w-full text-sm font-medium sm:text-base"
-                  size="lg"
-                  startContent={!isLoading && <Search className="h-4 w-4" />}
-                >
-                  {isLoading ? "Memuat Data..." : "Tampilkan Data"}
-                </Button>
+                      <Checkbox
+                        value="mahasiswaBaru"
+                        isDisabled={selectedOptions.includes("kelasBaru")}
+                        size="sm"
+                        color="secondary"
+                        className="min-w-[150px] flex-1"
+                      >
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-purple-500" />
+                          Mahasiswa Baru
+                        </div>
+                      </Checkbox>
+                    </CheckboxGroup>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    color="secondary"
+                    isLoading={isLoading}
+                    isDisabled={!kelas.trim() || selectedOptions.length === 0}
+                    radius="lg"
+                    variant="shadow"
+                    className="w-full whitespace-nowrap text-sm font-medium sm:w-auto sm:text-base"
+                    size="lg"
+                    startContent={getStartContent()}
+                    spinner={<IOSpinner />}
+                  >
+                    {getButtonContent()}
+                  </Button>
+                </div>
               </div>
             </div>
           </Form>
