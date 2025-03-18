@@ -131,8 +131,10 @@ export default function Home() {
       setKelas(searchKelas);
       setSelectedOptions(searchOptions);
       setIsLoading(true);
+      setShowKelasData(false);
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       setIsLoading(false);
       setShowKelasData(true);
     },

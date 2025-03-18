@@ -10,7 +10,7 @@ import {
   Chip,
   Form,
 } from "@heroui/react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Search, Info, Calendar, Users, User, Mail } from "lucide-react";
 import { IOSpinner } from "./IOSpinner";
 import CheckIcon from "./CheckIcon";
@@ -27,6 +27,7 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
     Record<string, string>
   >({});
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
 
   const handleKelasChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +56,7 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
         return;
       }
 
+      setFormSubmitted(true);
       setValidationErrors({});
       onSubmit(kelas, selectedOptions);
     },
@@ -62,15 +64,32 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
   );
 
   useEffect(() => {
-    if (!isLoading && showSuccess) {
-      const timer = setTimeout(() => {
-        setShowSuccess(false);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (isLoading && !showSuccess) {
-      setShowSuccess(true);
+    let successTimer: NodeJS.Timeout;
+    let hideSuccessTimer: NodeJS.Timeout;
+
+    if (isLoading) {
+      setShowSuccess(false);
+    } else if (
+      !isLoading &&
+      formSubmitted &&
+      kelas &&
+      selectedOptions.length > 0 &&
+      !showSuccess
+    ) {
+      successTimer = setTimeout(() => {
+        setShowSuccess(true);
+
+        hideSuccessTimer = setTimeout(() => {
+          setShowSuccess(false);
+        }, 2000);
+      }, 300);
     }
-  }, [isLoading, showSuccess]);
+
+    return () => {
+      if (successTimer) clearTimeout(successTimer);
+      if (hideSuccessTimer) clearTimeout(hideSuccessTimer);
+    };
+  }, [isLoading, kelas, selectedOptions, formSubmitted]);
 
   const handleOptionsChange = useCallback(
     (values: string[]) => {
@@ -101,19 +120,9 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
     if (isLoading) {
       return "Memuat Data...";
     } else if (!isLoading && showSuccess) {
-      return "Data Ditemukan";
+      return "Data Ditemukan!";
     } else {
       return "Tampilkan Data";
-    }
-  };
-
-  const getStartContent = () => {
-    if (isLoading) {
-      return null;
-    } else if (!isLoading && showSuccess) {
-      return <CheckIcon />;
-    } else {
-      return <Search className="h-4 w-4" />;
     }
   };
 
@@ -261,17 +270,46 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
 
                   <Button
                     type="submit"
-                    color="secondary"
+                    color={showSuccess ? "success" : "secondary"}
                     isLoading={isLoading}
                     isDisabled={!kelas.trim() || selectedOptions.length === 0}
                     radius="lg"
                     variant="shadow"
-                    className="w-full whitespace-nowrap text-sm font-medium sm:w-auto sm:text-base"
+                    className={`w-full whitespace-nowrap text-sm font-medium transition-all duration-300 sm:w-auto sm:text-base ${
+                      showSuccess ? "scale-105" : ""
+                    }`}
                     size="lg"
-                    startContent={getStartContent()}
+                    startContent={
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={
+                            isLoading
+                              ? "loading"
+                              : showSuccess
+                                ? "success"
+                                : "default"
+                          }
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          {isLoading ? null : showSuccess ? (
+                            <CheckIcon />
+                          ) : (
+                            <Search className="h-4 w-4" />
+                          )}
+                        </motion.div>
+                      </AnimatePresence>
+                    }
                     spinner={<IOSpinner />}
                   >
-                    {getButtonContent()}
+                    <motion.span
+                      animate={showSuccess ? { scale: [1, 1.05, 1] } : {}}
+                      transition={{ duration: 0.4, times: [0, 0.5, 1] }}
+                    >
+                      {getButtonContent()}
+                    </motion.span>
                   </Button>
                 </div>
               </div>
