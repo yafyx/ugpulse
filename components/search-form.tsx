@@ -274,10 +274,8 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
                     isLoading={isLoading}
                     isDisabled={!kelas.trim() || selectedOptions.length === 0}
                     radius="lg"
-                    variant="shadow"
-                    className={`w-full whitespace-nowrap text-sm font-medium transition-all duration-300 sm:w-auto sm:text-base ${
-                      showSuccess ? "scale-105" : ""
-                    }`}
+                    variant="solid"
+                    className="w-full whitespace-nowrap text-sm font-medium transition-all duration-200 sm:w-auto sm:text-base"
                     size="lg"
                     startContent={
                       <AnimatePresence mode="wait">
@@ -304,12 +302,7 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
                     }
                     spinner={<IOSpinner />}
                   >
-                    <motion.span
-                      animate={showSuccess ? { scale: [1, 1.05, 1] } : {}}
-                      transition={{ duration: 0.4, times: [0, 0.5, 1] }}
-                    >
-                      {getButtonContent()}
-                    </motion.span>
+                    <span>{getButtonContent()}</span>
                   </Button>
                 </div>
               </div>
