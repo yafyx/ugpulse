@@ -1,11 +1,11 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "ugcnn",
+  name: "UG Pulse",
   description: "",
   navItems: [
     {
-      label: "Timeline",
+      label: "timeline_",
       href: "/timeline",
     },
 

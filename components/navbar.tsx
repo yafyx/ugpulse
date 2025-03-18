@@ -27,7 +27,7 @@ export const Navbar = () => {
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="max-w-fit gap-3">
           <NextLink className="flex items-center justify-start gap-1" href="/">
-            <p className="font-bold text-inherit">UG Pulse</p>
+            <p className="text-inherit">UG-PULSE.</p>
           </NextLink>
         </NavbarBrand>
         <ul className="ml-2 hidden justify-start gap-4 lg:flex">
@@ -63,10 +63,9 @@ export const Navbar = () => {
             as={Link}
             className="bg-default-100 text-sm font-normal text-default-600"
             href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
             variant="flat"
           >
-            Sponsor
+            support me
           </Button>
         </NavbarItem>
       </NavbarContent>

@@ -355,10 +355,6 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
               </div>
             </div>
           </Form>
-
-          <div className="border-t border-zinc-200/30 px-4 py-3 text-xs text-zinc-500 dark:border-zinc-700/30 sm:text-sm">
-            Cari informasi akademik terbaru dengan mudah
-          </div>
         </CardBody>
       </Card>
     </div>

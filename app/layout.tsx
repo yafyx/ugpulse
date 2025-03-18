@@ -7,6 +7,7 @@ import { Providers } from "./providers";
 import { siteConfig } from "@/config/site";
 import { fontSans, fontMono } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
   title: {
@@ -59,16 +60,7 @@ export default function RootLayout({
             <main className="container mx-auto flex-grow px-4 pt-8 sm:px-6 lg:px-8">
               {children}
             </main>
-            <footer
-              className="mt-12 w-full border-t border-zinc-200/20 bg-white/60 py-6 backdrop-blur-md dark:border-zinc-700/30 dark:bg-zinc-900/60"
-              aria-label="Footer"
-            >
-              <div className="container mx-auto flex flex-col items-center justify-center space-y-3 px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center space-x-4">
-                  Made with ❤️ by yfyx
-                </div>
-              </div>
-            </footer>
+            <Footer />
           </div>
         </Providers>
       </body>

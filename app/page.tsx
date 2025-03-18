@@ -16,6 +16,7 @@ import SearchForm from "@/components/search-form";
 import SearchResults from "@/components/search-results";
 import NewsSection from "@/components/news-section";
 import TimelineSkeleton from "@/components/timeline-skeleton";
+import { CalendarRange } from "lucide-react";
 
 interface Event {
   kegiatan: string;
@@ -186,11 +187,10 @@ export default function Home() {
     <div className="container mx-auto w-full px-4 py-6 sm:px-6">
       <section aria-label="Search Form" className="mb-12 w-full">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold sm:text-3xl">UG Pulse</h2>
-          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
-            Masukkan NPM, nama, atau kelas untuk mencari data akademik yang kamu
-            butuhkan
-          </p>
+          <h2 className="mt-3 text-2xl tracking-tight text-zinc-800 dark:text-zinc-300 md:text-3xl">
+            Masukin NPM, nama, atau kelas buat nyari data akademik yang
+            dibutuhkan
+          </h2>
         </div>
         <SearchForm onSubmit={handleSearchSubmit} isLoading={isLoading} />
       </section>
@@ -219,10 +219,17 @@ export default function Home() {
 
       <section aria-label="Kalender Akademik" className="mb-12">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-zinc-800 dark:text-zinc-100">
-            Timeline Akademik
-          </h2>
-          <Chip color="primary" variant="dot" className="font-medium">
+          <div className="flex items-center gap-3">
+            <h3 className="max-w-lg text-xl font-medium tracking-tight md:text-2xl">
+              Timeline <strong className="font-bold">Akademik</strong>_
+            </h3>
+          </div>
+          <Chip
+            color="default"
+            variant="bordered"
+            className="relative pl-4 font-medium"
+          >
+            <span className="absolute left-2.5 top-1/2 h-2 w-2 -translate-y-1/2 animate-pulse rounded-full bg-current"></span>
             Terbaru
           </Chip>
         </div>
