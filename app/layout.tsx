@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { Providers } from "./providers";
 
 import { siteConfig } from "@/config/site";
-import { fontSans } from "@/config/fonts";
+import { fontSans, fontMono } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
 
 export const metadata: Metadata = {
@@ -35,7 +35,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning lang="en" className={fontSans.variable}>
+    <html
+      suppressHydrationWarning
+      lang="en"
+      className={`${fontSans.variable} ${fontMono.variable}`}
+    >
       <body
         className={clsx(
           "bg-zinc-100 font-sans text-zinc-900 antialiased dark:bg-zinc-900 dark:text-zinc-100",
