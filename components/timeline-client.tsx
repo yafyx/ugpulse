@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Chip } from "@heroui/chip";
 import { Link } from "@heroui/link";
@@ -48,6 +48,21 @@ interface ProcessedData {
   eventPositions: EventWithLane[];
   maxLaneIndex: number;
 }
+
+// Client-side cache for event status to prevent recalculations
+type EventStatusCache = Map<
+  string,
+  {
+    short: string;
+    full: string;
+    position: string;
+    secondsLeft: number;
+    timestamp: number;
+  }
+>;
+
+// Create a global status cache that persists between renders
+const eventStatusCache: EventStatusCache = new Map();
 
 // Monochromatic color scheme for events - slightly lightened for better contrast
 const eventColors = [
@@ -148,9 +163,10 @@ export const TimelineClient: React.FC<{
 
   // Update current time every second with debounce
   useEffect(() => {
+    // Update less frequently (every 5 seconds) to reduce calculations
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-    }, 1000);
+    }, 5000);
 
     return () => clearInterval(timer);
   }, []);
@@ -259,14 +275,13 @@ export const TimelineClient: React.FC<{
 
   // Update selected event status when time changes - reduced frequency
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-      if (selectedEvent) {
-        setSelectedEventStatus(getEventStatus(selectedEvent));
-      }
+    if (!selectedEvent) return;
+
+    const updateTimer = setInterval(() => {
+      setSelectedEventStatus(getEventStatus(selectedEvent));
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => clearInterval(updateTimer);
   }, [selectedEvent]);
 
   // Update status when selected event changes
@@ -274,7 +289,7 @@ export const TimelineClient: React.FC<{
     if (selectedEvent) {
       setSelectedEventStatus(getEventStatus(selectedEvent));
     }
-  }, [currentTime, selectedEvent]);
+  }, [selectedEvent]);
 
   // Optimize wheel event handling with requestAnimationFrame
   useEffect(() => {
@@ -317,22 +332,34 @@ export const TimelineClient: React.FC<{
     };
   }, [isMouseOverTimeline]);
 
+  // Get event status with caching to prevent repeated calculations
   const getEventStatus = (event: Event) => {
+    const now = new Date();
+    const cacheKey = `${event.kegiatan}-${event.start}-${event.end}`;
+
+    // Check if we have a cached status less than 1 minute old
+    const cachedStatus = eventStatusCache.get(cacheKey);
+    if (cachedStatus && now.getTime() - cachedStatus.timestamp < 60000) {
+      return cachedStatus;
+    }
+
+    // Calculate new status
     const start = parseDate(event.start);
     const end = parseDate(event.end);
-    const now = new Date();
+
+    let status: any;
 
     if (isBefore(now, start)) {
       const daysUntilStart = differenceInDays(start, now);
       const secondsLeft = differenceInSeconds(start, now);
-      return {
+      status = {
         short: `${daysUntilStart}h`,
         full: `Dimulai dlm ${daysUntilStart} hari`,
         position: "start",
         secondsLeft,
       };
     } else if (isAfter(now, end)) {
-      return {
+      status = {
         short: "Selesai",
         full: "Selesai",
         position: "end",
@@ -341,13 +368,19 @@ export const TimelineClient: React.FC<{
     } else {
       const daysUntilEnd = differenceInDays(end, now);
       const secondsLeft = differenceInSeconds(end, now);
-      return {
+      status = {
         short: `${daysUntilEnd}h`,
         full: `Berakhir dlm ${daysUntilEnd} hari`,
         position: "end",
         secondsLeft,
       };
     }
+
+    // Add timestamp and cache
+    status.timestamp = now.getTime();
+    eventStatusCache.set(cacheKey, status);
+
+    return status;
   };
 
   const handleEventClick = (event: Event) => {
@@ -356,23 +389,27 @@ export const TimelineClient: React.FC<{
     onOpen();
   };
 
-  const formatTimeLeft = (seconds: number) => {
-    const hours = Math.floor((seconds % (24 * 3600)) / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
+  // Memoize the time formatting function to prevent unnecessary calculations
+  const formatTimeLeft = useMemo(() => {
+    return (seconds: number) => {
+      const hours = Math.floor((seconds % (24 * 3600)) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
 
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
+      return `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    };
+  }, []);
 
   const weekdays = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
-  const currentTimePosition = (() => {
+  // Calculate current time position only when current time changes
+  const currentTimePosition = useMemo(() => {
     const diffInSeconds = differenceInSeconds(currentTime, displayStartDate);
     const diffInDays = diffInSeconds / (24 * 60 * 60);
     return diffInDays * 40;
-  })();
+  }, [currentTime, displayStartDate]);
 
   const laneHeight = 36;
   const headerHeight = 80;

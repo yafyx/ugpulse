@@ -16,12 +16,24 @@ interface Kalender {
   data: Event[];
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+// Implement custom fetcher with caching
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch data");
+  return res.json();
+};
 
 export default function TimelinePage() {
   const { data: eventsData, error: eventsError } = useSWR<Kalender>(
     "https://baak-api.vercel.app/kalender",
     fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      dedupingInterval: 86400000, // 24 hours in milliseconds
+      // Only revalidate once per day
+      refreshInterval: 86400000, // 24 hours in milliseconds
+    },
   );
 
   if (eventsError) {

@@ -112,6 +112,89 @@ const calculateEventPositions = (events: Event[]): EventWithLane[] => {
   });
 };
 
+// Process the data and return cached result with stable object references
+const processTimelineData = (events: Event[]): ProcessedData => {
+  if (!events.length)
+    return {
+      adjustedEvents: [],
+      earliestStart: new Date(),
+      latestEnd: new Date(),
+      displayStartDate: new Date(),
+      displayEndDate: new Date(),
+      allDates: [],
+      months: {},
+      eventPositions: [],
+      maxLaneIndex: 0,
+    };
+
+  const adjustedEvents = events.map((event) => {
+    const start = parseDate(event.start, event.end);
+    const end = parseDate(event.end);
+    if (isSameDay(start, end)) {
+      return {
+        ...event,
+        start: format(subDays(end, 7), "d MMMM yyyy", { locale: id }),
+      };
+    }
+    return {
+      ...event,
+      start: format(start, "d MMMM yyyy", { locale: id }),
+      end: format(end, "d MMMM yyyy", { locale: id }),
+    };
+  });
+
+  // Calculate date ranges
+  const earliestStart = adjustedEvents.reduce((earliest, event) => {
+    const start = parseDate(event.start);
+    return start < earliest ? start : earliest;
+  }, parseDate(adjustedEvents[0].start));
+
+  const latestEnd = adjustedEvents.reduce((latest, event) => {
+    const end = parseDate(event.end);
+    return end > latest ? end : latest;
+  }, parseDate(adjustedEvents[0].end));
+
+  const displayStartDate = startOfMonth(earliestStart);
+  const displayEndDate = addDays(latestEnd, 27);
+
+  // Generate all dates
+  const allDates: Date[] = [];
+  let currentDate = displayStartDate;
+  while (currentDate <= displayEndDate) {
+    allDates.push(currentDate);
+    currentDate = addDays(currentDate, 1);
+  }
+
+  // Group dates by month
+  const months = allDates.reduce<{ [key: string]: Date[] }>((acc, date) => {
+    const monthKey = format(date, "yyyy-MM");
+    if (!acc[monthKey]) {
+      acc[monthKey] = [];
+    }
+    acc[monthKey].push(date);
+    return acc;
+  }, {});
+
+  // Calculate event positions
+  const eventPositions = calculateEventPositions(adjustedEvents);
+  const maxLaneIndex = Math.max(...eventPositions.map((e) => e.laneIndex), 0);
+
+  return {
+    adjustedEvents,
+    earliestStart,
+    latestEnd,
+    displayStartDate,
+    displayEndDate,
+    allDates,
+    months,
+    eventPositions,
+    maxLaneIndex,
+  };
+};
+
+// Cache the processed data with a key based on events list length and some event properties
+const dataCache = new Map<string, ProcessedData>();
+
 // Dynamically import the client component with loading disabled to prevent server/client mismatch
 const TimelineClient = dynamic(() => import("./timeline-client"), {
   loading: () => <TimelineSkeleton />,
@@ -119,84 +202,27 @@ const TimelineClient = dynamic(() => import("./timeline-client"), {
 });
 
 const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
+  // Generate a cache key based on the events
+  const cacheKey = useMemo(() => {
+    if (!events.length) return "empty";
+    // Use first and last event dates plus count as key for daily caching
+    const firstEvent = events[0];
+    const lastEvent = events[events.length - 1];
+    return `${events.length}-${firstEvent.start}-${lastEvent.end}-${new Date().toISOString().split("T")[0]}`;
+  }, [events]);
+
+  // Process data with caching for daily reuse
   const processedData = useMemo(() => {
-    if (!events.length)
-      return {
-        adjustedEvents: [],
-        earliestStart: new Date(),
-        latestEnd: new Date(),
-        displayStartDate: new Date(),
-        displayEndDate: new Date(),
-        allDates: [],
-        months: {},
-        eventPositions: [],
-        maxLaneIndex: 0,
-      };
-
-    const adjustedEvents = events.map((event) => {
-      const start = parseDate(event.start, event.end);
-      const end = parseDate(event.end);
-      if (isSameDay(start, end)) {
-        return {
-          ...event,
-          start: format(subDays(end, 7), "d MMMM yyyy", { locale: id }),
-        };
-      }
-      return {
-        ...event,
-        start: format(start, "d MMMM yyyy", { locale: id }),
-        end: format(end, "d MMMM yyyy", { locale: id }),
-      };
-    });
-
-    // Calculate date ranges
-    const earliestStart = adjustedEvents.reduce((earliest, event) => {
-      const start = parseDate(event.start);
-      return start < earliest ? start : earliest;
-    }, parseDate(adjustedEvents[0].start));
-
-    const latestEnd = adjustedEvents.reduce((latest, event) => {
-      const end = parseDate(event.end);
-      return end > latest ? end : latest;
-    }, parseDate(adjustedEvents[0].end));
-
-    const displayStartDate = startOfMonth(earliestStart);
-    const displayEndDate = addDays(latestEnd, 27);
-
-    // Generate all dates
-    const allDates: Date[] = [];
-    let currentDate = displayStartDate;
-    while (currentDate <= displayEndDate) {
-      allDates.push(currentDate);
-      currentDate = addDays(currentDate, 1);
+    // Return cached data if available
+    if (dataCache.has(cacheKey)) {
+      return dataCache.get(cacheKey)!;
     }
 
-    // Group dates by month
-    const months = allDates.reduce<{ [key: string]: Date[] }>((acc, date) => {
-      const monthKey = format(date, "yyyy-MM");
-      if (!acc[monthKey]) {
-        acc[monthKey] = [];
-      }
-      acc[monthKey].push(date);
-      return acc;
-    }, {});
-
-    // Calculate event positions
-    const eventPositions = calculateEventPositions(adjustedEvents);
-    const maxLaneIndex = Math.max(...eventPositions.map((e) => e.laneIndex), 0);
-
-    return {
-      adjustedEvents,
-      earliestStart,
-      latestEnd,
-      displayStartDate,
-      displayEndDate,
-      allDates,
-      months,
-      eventPositions,
-      maxLaneIndex,
-    };
-  }, [events]);
+    // Process data and store in cache
+    const data = processTimelineData(events);
+    dataCache.set(cacheKey, data);
+    return data;
+  }, [events, cacheKey]);
 
   return <TimelineClient events={events} processedData={processedData} />;
 };
