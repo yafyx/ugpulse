@@ -22,7 +22,7 @@ export const Navbar = () => {
       maxWidth="full"
       position="sticky"
       isBordered
-      className="bg-transparent"
+      className="bg-transparent px-2 sm:px-8"
     >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="max-w-fit gap-3">
