@@ -70,6 +70,16 @@ const fetcher = async (url: string) => {
 
   if (!response.ok) {
     const error = new Error("An error occurred while fetching the data.");
+
+    error.cause = {
+      status: response.status,
+      isServerDown: response.status === 500,
+      message:
+        response.status === 500
+          ? "BAAK sedang tidak dapat diakses. Silakan coba lagi nanti."
+          : `Error ${response.status}: ${response.statusText}`,
+    };
+
     throw error;
   }
 
@@ -141,50 +151,6 @@ export default function Home() {
     [],
   );
 
-  if (eventsError) {
-    return (
-      <div className="flex min-h-[50vh] w-full flex-col items-center justify-center rounded-xl p-4">
-        <Card className="max-w-md border-none bg-gradient-to-br from-white/90 to-white/70 shadow-xl backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
-          <CardHeader className="border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
-            <div className="flex items-center gap-3 text-red-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-              <h1 className="text-xl font-bold">Error</h1>
-            </div>
-          </CardHeader>
-          <CardBody className="p-6">
-            <p className="text-zinc-700 dark:text-zinc-300">
-              Failed to load calendar data. Please try again later.
-            </p>
-          </CardBody>
-          <CardFooter className="border-t border-zinc-100 px-6 py-4 dark:border-zinc-800">
-            <Button
-              color="primary"
-              variant="shadow"
-              onClick={() => window.location.reload()}
-              radius="sm"
-              className="w-full"
-            >
-              Refresh Page
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto w-full px-4 sm:px-6">
       <section aria-label="Search Form" className="mb-12 w-full">
@@ -236,6 +202,46 @@ export default function Home() {
 
         {isEventsLoading ? (
           <TimelineSkeleton />
+        ) : eventsError ? (
+          <div className="flex min-h-[300px] w-full flex-col items-center justify-center rounded-xl bg-gradient-to-br from-white/90 to-white/70 p-6 shadow-lg backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
+            <div className="text-center">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-red-500"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+              </div>
+              <h4 className="mb-2 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                {(eventsError as any)?.cause?.isServerDown
+                  ? "Server tidak dapat diakses"
+                  : "Gagal memuat data kalender"}
+              </h4>
+              <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+                {(eventsError as any)?.cause?.isServerDown
+                  ? "Server utama BAAK sedang tidak dapat diakses. Silakan coba lagi nanti."
+                  : "Terjadi kesalahan saat mengambil data kalender akademik. Silakan coba lagi."}
+              </p>
+              <Button
+                variant="flat"
+                color="primary"
+                size="sm"
+                onClick={() => window.location.reload()}
+                className="mx-auto"
+              >
+                Muat Ulang
+              </Button>
+            </div>
+          </div>
         ) : eventsData && eventsData.data ? (
           <Suspense fallback={<TimelineSkeleton />}>
             <Timeline events={eventsData.data} />

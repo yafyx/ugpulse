@@ -3,6 +3,7 @@ import React from "react";
 import useSWR from "swr";
 import Timeline from "@/components/timeline";
 import { Spinner } from "@heroui/react";
+import { Button } from "@heroui/react";
 
 interface Event {
   kegiatan: string;
@@ -19,7 +20,20 @@ interface Kalender {
 // Implement custom fetcher with caching
 const fetcher = async (url: string) => {
   const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch data");
+  if (!res.ok) {
+    const error = new Error("Failed to fetch data");
+
+    error.cause = {
+      status: res.status,
+      isServerDown: res.status === 500,
+      message:
+        res.status === 500
+          ? "BAAK sedang tidak dapat diakses. Silakan coba lagi nanti."
+          : `Error ${res.status}: ${res.statusText}`,
+    };
+
+    throw error;
+  }
   return res.json();
 };
 
@@ -40,10 +54,41 @@ export default function TimelinePage() {
     return (
       <div className="flex h-screen items-center justify-center bg-zinc-100 p-4 dark:bg-zinc-900">
         <div className="max-w-md rounded-lg border border-zinc-200/20 bg-white/80 p-6 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
-          <h2 className="mb-4 text-xl font-bold text-red-500">Error</h2>
-          <p className="text-zinc-700 dark:text-zinc-300">
-            Failed to load timeline data
+          <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-red-500"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h2 className="mb-2 text-xl font-bold text-red-500">
+            {(eventsError as any)?.cause?.isServerDown
+              ? "Server tidak dapat diakses"
+              : "Error"}
+          </h2>
+          <p className="mb-4 text-zinc-700 dark:text-zinc-300">
+            {(eventsError as any)?.cause?.isServerDown
+              ? "Server utama BAAK sedang tidak dapat diakses. Silakan coba lagi nanti."
+              : "Failed to load timeline data"}
           </p>
+          <Button
+            variant="flat"
+            color="primary"
+            size="sm"
+            onClick={() => window.location.reload()}
+            className="w-full"
+          >
+            Coba Lagi
+          </Button>
         </div>
       </div>
     );

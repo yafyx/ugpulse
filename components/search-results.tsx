@@ -133,11 +133,36 @@ export default function SearchResults({
             className={`w-full ${selectedOptionsCount > 1 ? "md:w-[calc(50%-12px)]" : ""} transition-all duration-300`}
           >
             {jadwalError ? (
-              <div className="flex flex-col items-center justify-center p-4 text-center">
-                <p className="text-red-500">Failed to load jadwal data</p>
+              <div className="flex h-full flex-col items-center justify-center rounded-lg border border-zinc-200/20 bg-white/80 p-6 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-red-500"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                </div>
+                <h4 className="mb-2 text-center text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                  {(jadwalError as any)?.cause?.isServerDown
+                    ? "BAAK sedang tidak dapat diakses. Silakan coba lagi nanti."
+                    : "Gagal memuat data jadwal"}
+                </h4>
+                <p className="mb-4 text-center text-sm text-zinc-600 dark:text-zinc-400">
+                  {(jadwalError as any)?.cause?.isServerDown
+                    ? "BAAK sedang tidak dapat diakses. Silakan coba lagi nanti."
+                    : "Terjadi kesalahan saat mengambil data jadwal. Silakan coba lagi."}
+                </p>
                 <Button
                   size="sm"
-                  className="mt-2 bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
+                  className="bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
                   onClick={() => window.location.reload()}
                 >
                   Coba Lagi
@@ -160,11 +185,36 @@ export default function SearchResults({
             className={`w-full ${selectedOptionsCount > 1 ? "md:w-[calc(50%-12px)]" : ""} transition-all duration-300`}
           >
             {kelasBaruError ? (
-              <div className="flex flex-col items-center justify-center p-4 text-center">
-                <p className="text-red-500">Failed to load kelas baru data</p>
+              <div className="flex h-full flex-col items-center justify-center rounded-lg border border-zinc-200/20 bg-white/80 p-6 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-red-500"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                </div>
+                <h4 className="mb-2 text-center text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                  {(kelasBaruError as any)?.cause?.isServerDown
+                    ? "BAAK sedang tidak dapat diakses. Silakan coba lagi nanti."
+                    : "Gagal memuat data kelas baru"}
+                </h4>
+                <p className="mb-4 text-center text-sm text-zinc-600 dark:text-zinc-400">
+                  {(kelasBaruError as any)?.cause?.isServerDown
+                    ? "BAAK sedang tidak dapat diakses. Silakan coba lagi nanti."
+                    : "Terjadi kesalahan saat mengambil data kelas baru. Silakan coba lagi."}
+                </p>
                 <Button
                   size="sm"
-                  className="mt-2 bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
+                  className="bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
                   onClick={() => window.location.reload()}
                 >
                   Coba Lagi
@@ -187,13 +237,36 @@ export default function SearchResults({
             className={`w-full ${selectedOptionsCount > 1 ? "md:w-[calc(50%-12px)]" : ""} transition-all duration-300`}
           >
             {mahasiswaBaruError ? (
-              <div className="flex flex-col items-center justify-center p-4 text-center">
-                <p className="text-red-500">
-                  Failed to load mahasiswa baru data
+              <div className="flex h-full flex-col items-center justify-center rounded-lg border border-zinc-200/20 bg-white/80 p-6 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-red-500"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                </div>
+                <h4 className="mb-2 text-center text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                  {(mahasiswaBaruError as any)?.cause?.isServerDown
+                    ? "BAAK sedang tidak dapat diakses. Silakan coba lagi nanti."
+                    : "Gagal memuat data mahasiswa baru"}
+                </h4>
+                <p className="mb-4 text-center text-sm text-zinc-600 dark:text-zinc-400">
+                  {(mahasiswaBaruError as any)?.cause?.isServerDown
+                    ? "BAAK sedang tidak dapat diakses. Silakan coba lagi nanti."
+                    : "Terjadi kesalahan saat mengambil data mahasiswa baru. Silakan coba lagi."}
                 </p>
                 <Button
                   size="sm"
-                  className="mt-2 bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
+                  className="bg-zinc-800 text-white hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600"
                   onClick={() => window.location.reload()}
                 >
                   Coba Lagi
