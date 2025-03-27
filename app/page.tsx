@@ -201,7 +201,7 @@ export default function Home() {
         {isEventsLoading ? (
           <TimelineSkeleton />
         ) : eventsError ? (
-          <div className="flex min-h-[300px] w-full flex-col items-center justify-center rounded-xl bg-gradient-to-br from-white/90 to-white/70 p-6 shadow-lg backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
+          <div className="flex min-h-[300px] w-full flex-col items-center justify-center rounded-xl bg-gradient-to-br from-white/90 to-white/70 p-6 backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
             <div className="text-center">
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
                 <svg
@@ -250,7 +250,7 @@ export default function Home() {
             />
           </Suspense>
         ) : (
-          <div className="flex h-64 items-center justify-center rounded-xl bg-gradient-to-br from-white/90 to-white/70 p-6 shadow-lg backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
+          <div className="flex h-64 items-center justify-center rounded-xl bg-gradient-to-br from-white/90 to-white/70 p-6 backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
             <div className="text-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

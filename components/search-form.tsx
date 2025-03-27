@@ -124,7 +124,7 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
 
   return (
     <div className="search-form-container w-full">
-      <Card className="w-full overflow-hidden border border-zinc-200/20 bg-white/90 shadow-lg backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-900/90">
+      <Card className="w-full overflow-hidden border border-zinc-200/20 bg-white/90 backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-900/90">
         <CardBody className="p-0">
           <Form
             onSubmit={handleSubmit}

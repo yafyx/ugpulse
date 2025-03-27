@@ -520,7 +520,7 @@ const Timeline: React.FC<{
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Card className="overflow-hidden border border-zinc-200/20 bg-white/90 shadow-md dark:border-zinc-700/30 dark:bg-zinc-900/90">
+      <Card className="overflow-hidden border border-zinc-200/20 bg-white/90 dark:border-zinc-700/30 dark:bg-zinc-900/90">
         <CardBody className="p-0">
           <div className="flex items-center justify-between border-b border-zinc-200/30 p-4 dark:border-zinc-700/30">
             <div className="flex items-center gap-2">

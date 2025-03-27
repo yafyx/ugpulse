@@ -46,7 +46,7 @@ export default function SearchResults({
   }
 
   const JadwalSkeleton = () => (
-    <div className="h-full rounded-lg border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+    <div className="h-full rounded-lg border border-zinc-200/20 bg-white/80 backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
       <div className="border-b border-zinc-200/30 px-5 py-4 dark:border-zinc-700/30">
         <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
           Jadwal Kelas
@@ -65,7 +65,7 @@ export default function SearchResults({
   );
 
   const DataTableSkeleton = ({ title }: { title: string }) => (
-    <div className="h-full rounded-lg border border-zinc-200/20 bg-white/80 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+    <div className="h-full rounded-lg border border-zinc-200/20 bg-white/80 backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
       <div className="border-b border-zinc-200/30 px-5 py-4 dark:border-zinc-700/30">
         <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
           {title}
@@ -104,7 +104,7 @@ export default function SearchResults({
             className={`w-full ${selectedOptionsCount > 1 ? "md:w-[calc(50%-12px)]" : ""} transition-all duration-300`}
           >
             {jadwalError ? (
-              <div className="flex h-full flex-col items-center justify-center rounded-lg border border-zinc-200/20 bg-white/80 p-6 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+              <div className="flex h-full flex-col items-center justify-center rounded-lg border border-zinc-200/20 bg-white/80 p-6 backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -156,7 +156,7 @@ export default function SearchResults({
             className={`w-full ${selectedOptionsCount > 1 ? "md:w-[calc(50%-12px)]" : ""} transition-all duration-300`}
           >
             {kelasBaruError ? (
-              <div className="flex h-full flex-col items-center justify-center rounded-lg border border-zinc-200/20 bg-white/80 p-6 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+              <div className="flex h-full flex-col items-center justify-center rounded-lg border border-zinc-200/20 bg-white/80 p-6 backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -208,7 +208,7 @@ export default function SearchResults({
             className={`w-full ${selectedOptionsCount > 1 ? "md:w-[calc(50%-12px)]" : ""} transition-all duration-300`}
           >
             {mahasiswaBaruError ? (
-              <div className="flex h-full flex-col items-center justify-center rounded-lg border border-zinc-200/20 bg-white/80 p-6 shadow-xl backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
+              <div className="flex h-full flex-col items-center justify-center rounded-lg border border-zinc-200/20 bg-white/80 p-6 backdrop-blur-sm dark:border-zinc-700/30 dark:bg-zinc-800/80">
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
