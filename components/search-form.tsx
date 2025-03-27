@@ -269,10 +269,7 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
                     color={showSuccess ? "success" : "secondary"}
                     isLoading={isLoading}
                     isDisabled={!kelas.trim() || selectedOptions.length === 0}
-                    radius="lg"
-                    variant="solid"
-                    className="w-full whitespace-nowrap text-sm font-medium transition-all duration-200 sm:w-auto sm:text-base"
-                    size="lg"
+                    className="group relative w-full min-w-[160px] whitespace-nowrap text-sm transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[0.98] sm:w-auto sm:text-base"
                     startContent={
                       <AnimatePresence mode="wait">
                         <motion.div
@@ -283,10 +280,14 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
                                 ? "success"
                                 : "default"
                           }
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          transition={{ duration: 0.3 }}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{
+                            duration: 0.3,
+                            ease: "easeOut",
+                          }}
+                          className="relative z-10"
                         >
                           {isLoading ? null : showSuccess ? (
                             <CheckIcon />
@@ -298,7 +299,21 @@ export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
                     }
                     spinner={<IOSpinner />}
                   >
-                    <span>{getButtonContent()}</span>
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={getButtonContent()}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{
+                          duration: 0.3,
+                          ease: "easeOut",
+                        }}
+                        className="relative z-10"
+                      >
+                        {getButtonContent()}
+                      </motion.span>
+                    </AnimatePresence>
                   </Button>
                 </div>
               </div>
