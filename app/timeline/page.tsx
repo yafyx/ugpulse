@@ -1,9 +1,13 @@
 "use client";
-import React from "react";
-import useSWR from "swr";
+import React, { useState, useEffect } from "react";
 import Timeline from "@/components/timeline";
-import { Spinner } from "@heroui/react";
-import { Button } from "@heroui/react";
+import { Spinner, Button } from "@heroui/react";
+import {
+  getTimelineData,
+  saveTimelineData,
+  getLastFetchedFormatted,
+} from "@/lib/timelineStorage";
+import { ENDPOINTS } from "@/lib/types";
 
 interface Event {
   kegiatan: string;
@@ -38,17 +42,67 @@ const fetcher = async (url: string) => {
 };
 
 export default function TimelinePage() {
-  const { data: eventsData, error: eventsError } = useSWR<Kalender>(
-    "https://baak-api.vercel.app/kalender",
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateIfStale: false,
-      dedupingInterval: 86400000, // 24 hours in milliseconds
-      // Only revalidate once per day
-      refreshInterval: 86400000, // 24 hours in milliseconds
-    },
-  );
+  const [eventsData, setEventsData] = useState<Kalender | null>(null);
+  const [eventsError, setEventsError] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Load timeline data on initial render
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+
+      try {
+        const { data } = getTimelineData();
+
+        if (data) {
+          setEventsData(data);
+          setIsLoading(false);
+        } else {
+          // If no local data, fetch from API
+          await fetchData();
+        }
+      } catch (error) {
+        setEventsError(error);
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Function to fetch fresh data from API
+  const fetchData = async () => {
+    try {
+      const data = await fetcher(ENDPOINTS.kalender);
+      setEventsData(data);
+      saveTimelineData(data);
+      return data;
+    } catch (error) {
+      setEventsError(error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to refresh the timeline data
+  const refreshData = async () => {
+    setIsRefreshing(true);
+    try {
+      await fetchData();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-zinc-100 dark:bg-zinc-900">
+        <Spinner size="lg" color="default" />
+      </div>
+    );
+  }
 
   if (eventsError) {
     return (
@@ -84,20 +138,12 @@ export default function TimelinePage() {
             variant="flat"
             color="primary"
             size="sm"
-            onClick={() => window.location.reload()}
+            onClick={refreshData}
             className="w-full"
           >
             Coba Lagi
           </Button>
         </div>
-      </div>
-    );
-  }
-
-  if (!eventsData) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-zinc-100 dark:bg-zinc-900">
-        <Spinner size="lg" color="default" />
       </div>
     );
   }
@@ -122,7 +168,14 @@ export default function TimelinePage() {
         </div>
 
         <div className="w-full overflow-visible">
-          <Timeline events={eventsData.data} />
+          {eventsData && (
+            <Timeline
+              events={eventsData.data}
+              onRefresh={refreshData}
+              lastUpdated={getLastFetchedFormatted()}
+              isRefreshing={isRefreshing}
+            />
+          )}
         </div>
       </div>
     </div>

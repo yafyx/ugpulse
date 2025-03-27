@@ -2,36 +2,7 @@ import React from "react";
 import { Button, Skeleton } from "@heroui/react";
 import JadwalTable from "@/components/jadwal-table";
 import MahasiswaTable from "@/components/mahasiswa-table";
-
-interface Jadwal {
-  nama: string;
-  waktu: string;
-  jam: string;
-  ruang: string;
-  dosen: string;
-}
-
-interface JadwalData {
-  data: {
-    jadwal: {
-      [key: string]: Jadwal[] | null;
-    };
-  };
-}
-
-interface SearchResultsProps {
-  selectedOptions: string[];
-  kelas: string;
-  jadwalData: JadwalData | null;
-  kelasBaruData: any | null;
-  mahasiswaBaruData: any | null;
-  isJadwalLoading: boolean;
-  isKelasBaruLoading: boolean;
-  isMahasiswaBaruLoading: boolean;
-  jadwalError: any;
-  kelasBaruError: any;
-  mahasiswaBaruError: any;
-}
+import { Jadwal, JadwalData, SearchResultsProps } from "@/lib/types";
 
 export default function SearchResults({
   selectedOptions,

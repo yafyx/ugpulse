@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback, Suspense } from "react";
+import React, { useState, useCallback, Suspense, useEffect } from "react";
 import { Card, CardBody, CardHeader, CardFooter } from "@heroui/card";
 import {
   Button,
@@ -17,53 +17,21 @@ import SearchResults from "@/components/search-results";
 import NewsSection from "@/components/news-section";
 import TimelineSkeleton from "@/components/timeline-skeleton";
 import { CalendarRange } from "lucide-react";
-
-interface Event {
-  kegiatan: string;
-  tanggal: string;
-  start: string;
-  end: string;
-}
-
-interface Kalender {
-  status: string;
-  data: Event[];
-}
-
-interface Jadwal {
-  nama: string;
-  waktu: string;
-  jam: string;
-  ruang: string;
-  dosen: string;
-}
-
-interface JadwalHari {
-  [key: string]: Jadwal[] | null;
-}
-
-interface MahasiswaBaru {
-  no_pend: string;
-  nama: string;
-  npm: string;
-  kelas: string;
-  keterangan: string;
-}
-
-interface KelasBaru {
-  npm: string;
-  nama: string;
-  kelas_lama: string;
-  kelas_baru: string;
-}
-
-const API_BASE_URL = "https://baak-api.vercel.app";
-const ENDPOINTS = {
-  kalender: `${API_BASE_URL}/kalender`,
-  jadwal: (kelas: string) => `${API_BASE_URL}/jadwal/${kelas}`,
-  kelasBaru: (kelas: string) => `${API_BASE_URL}/kelasbaru/${kelas}`,
-  mahasiswaBaru: (kelas: string) => `${API_BASE_URL}/mahasiswabaru/${kelas}`,
-};
+import {
+  Event,
+  Kalender,
+  Jadwal,
+  JadwalHari,
+  MahasiswaBaru,
+  KelasBaru,
+  API_BASE_URL,
+  ENDPOINTS,
+} from "@/lib/types";
+import {
+  getTimelineData,
+  saveTimelineData,
+  getLastFetchedFormatted,
+} from "@/lib/timelineStorage";
 
 const fetcher = async (url: string) => {
   const response = await fetch(url);
@@ -92,13 +60,51 @@ export default function Home() {
   const [showKelasData, setShowKelasData] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    data: eventsData,
-    error: eventsError,
-    isLoading: isEventsLoading,
-  } = useSWR<Kalender>(ENDPOINTS.kalender, fetcher, {
-    revalidateOnFocus: false,
-  });
+  const [eventsData, setEventsData] = useState<Kalender | null>(null);
+  const [isEventsLoading, setIsEventsLoading] = useState(false);
+  const [eventsError, setEventsError] = useState<any>(null);
+  const [isRefreshingEvents, setIsRefreshingEvents] = useState(false);
+
+  useEffect(() => {
+    const { data } = getTimelineData();
+    if (data) {
+      setEventsData(data);
+    } else {
+      // If no local data, fetch from API
+      fetchTimelineData();
+    }
+  }, []);
+
+  // Function to fetch timeline data
+  const fetchTimelineData = async () => {
+    setIsEventsLoading(true);
+    setEventsError(null);
+
+    try {
+      const data = await fetcher(ENDPOINTS.kalender);
+      setEventsData(data);
+      saveTimelineData(data);
+      setIsEventsLoading(false);
+    } catch (error) {
+      setEventsError(error);
+      setIsEventsLoading(false);
+    }
+  };
+
+  // Function to refresh timeline data
+  const refreshTimelineData = async () => {
+    setIsRefreshingEvents(true);
+
+    try {
+      const data = await fetcher(ENDPOINTS.kalender);
+      setEventsData(data);
+      saveTimelineData(data);
+      setIsRefreshingEvents(false);
+    } catch (error) {
+      setEventsError(error);
+      setIsRefreshingEvents(false);
+    }
+  };
 
   const {
     data: jadwalData,
@@ -190,14 +196,6 @@ export default function Home() {
               Timeline <strong className="font-bold">Akademik</strong>_
             </h3>
           </div>
-          <Chip
-            color="default"
-            variant="bordered"
-            className="relative pl-4 font-medium"
-          >
-            <span className="absolute left-2.5 top-1/2 h-2 w-2 -translate-y-1/2 animate-pulse rounded-full bg-current"></span>
-            Terbaru
-          </Chip>
         </div>
 
         {isEventsLoading ? (
@@ -235,7 +233,7 @@ export default function Home() {
                 variant="flat"
                 color="primary"
                 size="sm"
-                onClick={() => window.location.reload()}
+                onClick={fetchTimelineData}
                 className="mx-auto"
               >
                 Muat Ulang
@@ -244,7 +242,12 @@ export default function Home() {
           </div>
         ) : eventsData && eventsData.data ? (
           <Suspense fallback={<TimelineSkeleton />}>
-            <Timeline events={eventsData.data} />
+            <Timeline
+              events={eventsData.data}
+              onRefresh={refreshTimelineData}
+              lastUpdated={getLastFetchedFormatted()}
+              isRefreshing={isRefreshingEvents}
+            />
           </Suspense>
         ) : (
           <div className="flex h-64 items-center justify-center rounded-xl bg-gradient-to-br from-white/90 to-white/70 p-6 shadow-lg backdrop-blur-lg dark:from-zinc-800/90 dark:to-zinc-900/70">
@@ -271,7 +274,7 @@ export default function Home() {
                 color="default"
                 size="sm"
                 className="mt-4"
-                onClick={() => window.location.reload()}
+                onClick={fetchTimelineData}
               >
                 Refresh
               </Button>

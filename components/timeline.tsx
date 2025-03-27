@@ -12,6 +12,7 @@ import {
   ModalFooter,
   useDisclosure,
   Button,
+  Tooltip,
 } from "@heroui/react";
 import {
   parseISO,
@@ -28,41 +29,12 @@ import {
 } from "date-fns";
 import { id } from "date-fns/locale";
 import TimelineSkeleton from "./timeline-skeleton";
-
-interface Event {
-  kegiatan: string;
-  tanggal: string;
-  start: string;
-  end: string;
-}
-
-interface EventWithLane extends Event {
-  laneIndex: number;
-}
-
-interface ProcessedData {
-  adjustedEvents: Event[];
-  earliestStart: Date;
-  latestEnd: Date;
-  displayStartDate: Date;
-  displayEndDate: Date;
-  allDates: Date[];
-  months: { [key: string]: Date[] };
-  eventPositions: EventWithLane[];
-  maxLaneIndex: number;
-}
-
-// Client-side cache for event status to prevent recalculations
-type EventStatusCache = Map<
-  string,
-  {
-    short: string;
-    full: string;
-    position: string;
-    secondsLeft: number;
-    timestamp: number;
-  }
->;
+import {
+  Event,
+  EventWithLane,
+  ProcessedData,
+  EventStatusCache,
+} from "@/lib/types";
 
 // Create a global status cache that persists between renders
 const eventStatusCache: EventStatusCache = new Map();
@@ -224,7 +196,12 @@ const processTimelineData = (events: Event[]): ProcessedData => {
   };
 };
 
-const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
+const Timeline: React.FC<{
+  events: Event[];
+  onRefresh?: () => void;
+  lastUpdated?: string;
+  isRefreshing?: boolean;
+}> = ({ events, onRefresh, lastUpdated, isRefreshing = false }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const timelineRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -546,6 +523,26 @@ const Timeline: React.FC<{ events: Event[] }> = ({ events }) => {
       <Card className="overflow-hidden border border-zinc-200/20 bg-white/90 shadow-md dark:border-zinc-700/30 dark:bg-zinc-900/90">
         <CardBody className="p-0">
           <div className="flex items-center justify-between border-b border-zinc-200/30 p-4 dark:border-zinc-700/30">
+            <div className="flex items-center gap-2">
+              {lastUpdated && (
+                <Tooltip content="Last time data was refreshed from server">
+                  <div className="rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-xs text-zinc-500 dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400">
+                    Terakhir diupdate: {lastUpdated}
+                  </div>
+                </Tooltip>
+              )}
+              {onRefresh && (
+                <Button
+                  size="sm"
+                  variant="flat"
+                  className="bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
+                  onClick={onRefresh}
+                  isLoading={isRefreshing}
+                >
+                  {isRefreshing ? "Refreshing..." : "Refresh Data"}
+                </Button>
+              )}
+            </div>
             <div className="ml-auto flex items-center gap-2">
               <div className="hidden rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-xs text-zinc-500 dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400 md:block">
                 Scroll untuk melihat lebih banyak

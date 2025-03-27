@@ -14,11 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Info, Calendar, Users, User, Mail } from "lucide-react";
 import { IOSpinner } from "./IOSpinner";
 import CheckIcon from "./CheckIcon";
-
-interface SearchFormProps {
-  onSubmit: (kelas: string, selectedOptions: string[]) => void;
-  isLoading: boolean;
-}
+import { SearchFormProps } from "@/lib/types";
 
 export default function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
   const [kelas, setKelas] = useState<string>("");
