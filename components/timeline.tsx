@@ -35,6 +35,8 @@ import {
   ProcessedData,
   EventStatusCache,
 } from "@/lib/types";
+import { History } from "lucide-react";
+import VersionHistoryModal from "./version-history-modal";
 
 // Create a global status cache that persists between renders
 const eventStatusCache: EventStatusCache = new Map();
@@ -205,7 +207,16 @@ const Timeline: React.FC<{
   const [currentTime, setCurrentTime] = useState(new Date());
   const timelineRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen: isEventModalOpen,
+    onOpen: onEventModalOpen,
+    onOpenChange: onEventModalOpenChange,
+  } = useDisclosure();
+  const {
+    isOpen: isHistoryModalOpen,
+    onOpen: onHistoryModalOpen,
+    onClose: onHistoryModalClose,
+  } = useDisclosure();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedEventStatus, setSelectedEventStatus] = useState<{
     short: string;
@@ -482,7 +493,7 @@ const Timeline: React.FC<{
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
     setSelectedEventStatus(getEventStatus(event));
-    onOpen();
+    onEventModalOpen();
   };
 
   // Memoize the time formatting function to prevent unnecessary calculations
@@ -525,22 +536,17 @@ const Timeline: React.FC<{
           <div className="flex items-center justify-between border-b border-zinc-200/30 p-4 dark:border-zinc-700/30">
             <div className="flex items-center gap-2">
               {lastUpdated && (
-                <Tooltip content="Last time data was refreshed from server">
-                  <div className="rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-xs text-zinc-500 dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400">
-                    Terakhir diupdate: {lastUpdated}
-                  </div>
+                <Tooltip content="Klik untuk melihat riwayat pembaruan">
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    className="gap-2 bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
+                    onClick={onHistoryModalOpen}
+                  >
+                    <History className="h-4 w-4" />
+                    <span>Terakhir diupdate: {lastUpdated}</span>
+                  </Button>
                 </Tooltip>
-              )}
-              {onRefresh && (
-                <Button
-                  size="sm"
-                  variant="flat"
-                  className="bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
-                  onClick={onRefresh}
-                  isLoading={isRefreshing}
-                >
-                  {isRefreshing ? "Refreshing..." : "Refresh Data"}
-                </Button>
               )}
             </div>
             <div className="ml-auto flex items-center gap-2">
@@ -784,10 +790,10 @@ const Timeline: React.FC<{
       <Modal
         placement="center"
         hideCloseButton={false}
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
+        isOpen={isEventModalOpen}
+        onOpenChange={onEventModalOpenChange}
         classNames={{
-          base: "bg-white/95 dark:bg-zinc-900/95 border border-zinc-200/20 dark:border-zinc-700/20 shadow-md",
+          base: "bg-white/95 dark:bg-zinc-900/95 border border-zinc-200/20 dark:border-zinc-700/20",
           header: "border-b border-zinc-200/20 dark:border-zinc-700/20",
           footer: "border-t border-zinc-200/20 dark:border-zinc-700/20",
         }}
@@ -856,6 +862,13 @@ const Timeline: React.FC<{
           )}
         </ModalContent>
       </Modal>
+
+      <VersionHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={onHistoryModalClose}
+        onRefresh={onRefresh}
+        isRefreshing={isRefreshing}
+      />
 
       <style jsx>{`
         .pulse-animation {
