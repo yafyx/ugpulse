@@ -1,3 +1,4 @@
+"use client";
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -10,6 +11,7 @@ import {
 import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import NextLink from "next/link";
+import { useState } from "react";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
@@ -17,17 +19,33 @@ import { GithubIcon, HeartFilledIcon, Logo } from "@/components/icons";
 import clsx from "clsx";
 
 export const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleLinkClick = () => {
+    setIsMenuOpen(false);
+  };
+
+  // Style to remove blue highlight when clicking
+  const noTapHighlight = "tap-highlight-transparent focus:outline-none";
+
   return (
     <NextUINavbar
       maxWidth="full"
       position="sticky"
       isBordered
       className="bg-transparent px-2 sm:px-8"
+      isMenuOpen={isMenuOpen}
+      onMenuOpenChange={setIsMenuOpen}
     >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="max-w-fit gap-3">
-          <NextLink className="flex items-center justify-start gap-1" href="/">
-            <p className="text-inherit">UG-PULSE.</p>
+          <NextLink
+            className={`flex items-center justify-start gap-1 ${noTapHighlight}`}
+            href="/"
+            onClick={handleLinkClick}
+            style={{ WebkitTapHighlightColor: "transparent" }}
+          >
+            <p className="text-xl font-bold text-inherit">UG-PULSE.</p>
           </NextLink>
         </NavbarBrand>
         <ul className="ml-2 hidden justify-start gap-4 lg:flex">
@@ -36,9 +54,11 @@ export const Navbar = () => {
               <NextLink
                 className={clsx(
                   "data-[active=true]:font-medium data-[active=true]:text-primary",
+                  noTapHighlight,
                 )}
                 color="foreground"
                 href={item.href}
+                style={{ WebkitTapHighlightColor: "transparent" }}
               >
                 {item.label}
               </NextLink>
@@ -52,7 +72,13 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden gap-2 sm:flex">
-          <Link isExternal aria-label="Github" href={siteConfig.links.github}>
+          <Link
+            isExternal
+            aria-label="Github"
+            href={siteConfig.links.github}
+            className={noTapHighlight}
+            style={{ WebkitTapHighlightColor: "transparent" }}
+          >
             <GithubIcon className="text-default-500" />
           </Link>
           <ThemeSwitch />
@@ -61,9 +87,10 @@ export const Navbar = () => {
           <Button
             isExternal
             as={Link}
-            className="bg-default-100 text-sm font-normal text-default-600"
+            className={`bg-default-100 text-sm font-normal text-default-600 ${noTapHighlight}`}
             href={siteConfig.links.sponsor}
             variant="flat"
+            style={{ WebkitTapHighlightColor: "transparent" }}
           >
             support me
           </Button>
@@ -71,36 +98,48 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarContent className="basis-1 pl-4 sm:hidden" justify="end">
-        <Link isExternal aria-label="Github" href={siteConfig.links.github}>
+        <Link
+          isExternal
+          aria-label="Github"
+          href={siteConfig.links.github}
+          className={noTapHighlight}
+          style={{ WebkitTapHighlightColor: "transparent" }}
+        >
           <GithubIcon className="text-default-500" />
         </Link>
         <ThemeSwitch />
-        <NavbarMenuToggle />
+        <NavbarMenuToggle
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          className={noTapHighlight}
+        />
       </NavbarContent>
 
-      <NavbarMenu>
-        {siteConfig.navItems.map((item, index) => (
+      <NavbarMenu className="pt-6">
+        {siteConfig.navItems.map((item) => (
           <NavbarMenuItem key={item.href}>
-            <Link
-              color="foreground"
-              className="w-full"
+            <NextLink
               href={item.href}
-              size="lg"
+              onClick={handleLinkClick}
+              className={`block w-full py-2 text-lg transition-colors hover:text-primary ${noTapHighlight}`}
+              style={{ WebkitTapHighlightColor: "transparent" }}
             >
               {item.label}
-            </Link>
+            </NextLink>
           </NavbarMenuItem>
         ))}
-        <Button
-          isExternal
-          as={Link}
-          className="mt-3 bg-default-100 text-sm font-normal text-default-600"
-          href={siteConfig.links.sponsor}
-          startContent={<HeartFilledIcon className="text-danger" />}
-          variant="flat"
-        >
-          Sponsor
-        </Button>
+        <NavbarMenuItem>
+          <Button
+            isExternal
+            as={Link}
+            className={`mt-4 w-full justify-center bg-default-100 text-sm font-normal text-default-600 ${noTapHighlight}`}
+            href={siteConfig.links.sponsor}
+            startContent={<HeartFilledIcon className="text-danger" />}
+            variant="flat"
+            style={{ WebkitTapHighlightColor: "transparent" }}
+          >
+            Sponsor
+          </Button>
+        </NavbarMenuItem>
       </NavbarMenu>
     </NextUINavbar>
   );
