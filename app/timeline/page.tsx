@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Timeline from "@/components/timeline";
+import TimelineSkeleton from "@/components/timeline-skeleton";
 import { Button } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import {
@@ -50,6 +51,7 @@ export default function TimelinePage() {
   });
   const [eventsError, setEventsError] = useState<any>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Load timeline data on initial render
   useEffect(() => {
@@ -57,6 +59,7 @@ export default function TimelinePage() {
   }, []);
 
   const loadData = async () => {
+    setIsLoading(true);
     try {
       const { data } = await fetchTimelineData();
       if (data) {
@@ -78,6 +81,8 @@ export default function TimelinePage() {
       }
     } catch (error) {
       setEventsError(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -189,12 +194,16 @@ export default function TimelinePage() {
         </div>
 
         <div className="w-full overflow-visible">
-          <Timeline
-            events={eventsData?.data || []}
-            onRefresh={refreshData}
-            lastUpdated={getLatestVersionTimestamp(false)}
-            isRefreshing={isRefreshing}
-          />
+          {isLoading ? (
+            <TimelineSkeleton />
+          ) : (
+            <Timeline
+              events={eventsData?.data || []}
+              onRefresh={refreshData}
+              lastUpdated={getLatestVersionTimestamp(false)}
+              isRefreshing={isRefreshing}
+            />
+          )}
         </div>
       </div>
     </div>
