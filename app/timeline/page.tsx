@@ -177,7 +177,7 @@ export default function TimelinePage() {
         <div className="absolute left-1/2 top-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-zinc-200/20 blur-3xl dark:bg-zinc-800/20"></div>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl">
+      <div className="container mx-auto w-full sm:px-2">
         <div className="col-span-full mb-8 flex flex-col">
           <h1 className="text-3xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 lg:text-4xl xl:text-5xl">
             Timeline Kalender Akademik
