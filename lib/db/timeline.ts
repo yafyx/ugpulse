@@ -24,7 +24,21 @@ export async function fetchTimelineData(): Promise<{ data: Kalender | null; vers
 
         if (result.success && result.data) {
             cachedData = result.data;
-            cachedVersions = result.versions.map(v => JSON.parse(v));
+            cachedVersions = result.versions.map(v => {
+                // Make sure we're only parsing strings
+                if (typeof v === 'string') {
+                    try {
+                        return JSON.parse(v);
+                    } catch (e) {
+                        console.error('Error parsing version:', e);
+                        return null;
+                    }
+                } else {
+                    // If it's already an object, return it as is
+                    return v;
+                }
+            }).filter(Boolean) as TimelineVersion[]; // Filter out null values
+
             lastFetched = new Date().toISOString();
             return { data: result.data, versions: cachedVersions };
         }
@@ -36,7 +50,7 @@ export async function fetchTimelineData(): Promise<{ data: Kalender | null; vers
     }
 }
 
-export async function saveTimelineData(data: Kalender): Promise<boolean> {
+export async function saveTimelineData(data: Kalender): Promise<{ success: boolean; versionStored: boolean; changes?: number }> {
     try {
         const response = await fetch('/api/timeline', {
             method: 'POST',
@@ -55,13 +69,17 @@ export async function saveTimelineData(data: Kalender): Promise<boolean> {
 
             // Fetch updated versions
             await fetchTimelineData();
-            return true;
+            return {
+                success: true,
+                versionStored: result.versionStored || false,
+                changes: result.changes || 0
+            };
         }
 
-        return false;
+        return { success: false, versionStored: false };
     } catch (error) {
         console.error('Failed to save timeline data:', error);
-        return false;
+        return { success: false, versionStored: false };
     }
 }
 
@@ -80,9 +98,26 @@ export function hasTimelineData(): boolean {
     return cachedData !== null;
 }
 
-export function getLastFetchedFormatted(timestamp?: string): string {
+export function getLastFetchedFormatted(timestamp?: string, useRelativeTime: boolean = true): string {
     const date = timestamp ? new Date(timestamp) : (lastFetched ? new Date(lastFetched) : null);
     if (!date) return "Never";
+
+    // Format for displaying the full date and time
+    const formatDate = (date: Date) => {
+        return new Intl.DateTimeFormat('id', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        }).format(date);
+    };
+
+    // If not using relative time, always show the formatted date
+    if (!useRelativeTime) {
+        return formatDate(date);
+    }
 
     const now = new Date();
     const diffInHours = Math.abs(now.getTime() - date.getTime()) / 36e5;
@@ -97,12 +132,18 @@ export function getLastFetchedFormatted(timestamp?: string): string {
     }
 
     // Otherwise show formatted date
-    return new Intl.DateTimeFormat('id', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-    }).format(date);
+    return formatDate(date);
+}
+
+// Get the timestamp of the latest version update (not just the check time)
+export function getLatestVersionTimestamp(useRelativeTime: boolean = true): string {
+    // If we have version history, use the timestamp from the most recent version
+    if (cachedVersions.length > 0) {
+        // First version in the array should be the most recent one
+        const latestVersion = cachedVersions[0];
+        return getLastFetchedFormatted(latestVersion.timestamp, useRelativeTime);
+    }
+
+    // Fall back to the last fetched time if no versions are available
+    return getLastFetchedFormatted(undefined, useRelativeTime);
 } 

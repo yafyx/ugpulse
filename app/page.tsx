@@ -10,6 +10,7 @@ import {
   Chip,
   Divider,
 } from "@heroui/react";
+import { addToast } from "@heroui/toast";
 import useSWR from "swr";
 import Timeline from "@/components/timeline";
 import SearchForm from "@/components/search-form";
@@ -31,6 +32,7 @@ import {
   fetchTimelineData,
   saveTimelineData,
   getLastFetchedFormatted,
+  getLatestVersionTimestamp,
 } from "@/lib/db/timeline";
 
 const fetcher = async (url: string) => {
@@ -105,11 +107,34 @@ export default function Home() {
 
       const data = await response.json();
 
-      await saveTimelineData(data);
+      // Save to Redis and get result
+      const result = await saveTimelineData(data);
 
       setEventsData(data);
+
+      // Show appropriate toast notification
+      if (result.success) {
+        if (result.versionStored) {
+          addToast({
+            title: "Berhasil",
+            description: `Data berhasil diperbarui dengan ${result.changes} perubahan`,
+            color: "success",
+          });
+        } else {
+          addToast({
+            title: "Info",
+            description: "Tidak ada perubahan pada data kalender akademik",
+            color: "primary",
+          });
+        }
+      }
     } catch (error) {
       setEventsError(error);
+      addToast({
+        title: "Gagal",
+        description: "Gagal memperbarui data",
+        color: "danger",
+      });
     } finally {
       setIsRefreshingEvents(false);
     }
@@ -254,7 +279,7 @@ export default function Home() {
             <Timeline
               events={eventsData.data}
               onRefresh={refreshTimelineData}
-              lastUpdated={getLastFetchedFormatted()}
+              lastUpdated={getLatestVersionTimestamp(false)}
               isRefreshing={isRefreshingEvents}
             />
           </Suspense>

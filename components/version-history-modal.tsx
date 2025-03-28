@@ -100,7 +100,7 @@ export default function VersionHistoryModal({
                         )}
                       </div>
                       <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                        {getLastFetchedFormatted(version.timestamp)}
+                        {getLastFetchedFormatted(version.timestamp, false)}
                       </span>
                       <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
                         {version.data.data.length} kegiatan tercatat

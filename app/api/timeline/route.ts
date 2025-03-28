@@ -27,7 +27,7 @@ export async function GET() {
             // Save to Redis
             await redis.set(TIMELINE_KEY, apiData);
 
-            // Add to versions list
+            // Add to versions list only for initial load
             const timestamp = new Date().toISOString();
             const version = {
                 data: apiData,
@@ -47,10 +47,20 @@ export async function GET() {
             });
         }
 
+        // Make sure all versions are strings for proper JSON parsing
+        const processedVersions = versions.map(v => {
+            // If already a string, return it
+            if (typeof v === 'string') {
+                return v;
+            }
+            // If an object, stringify it
+            return JSON.stringify(v);
+        });
+
         return NextResponse.json({
             success: true,
             data,
-            versions,
+            versions: processedVersions,
             source: 'redis'
         });
     } catch (error) {
@@ -82,24 +92,28 @@ export async function POST(request: Request) {
             });
         }
 
-        // Save new version with metadata
-        const version = {
-            data: body,
-            timestamp,
-            changes: changes || undefined
-        };
-
         // Store current data
         await redis.set(TIMELINE_KEY, body);
 
-        // Add to versions list (keep only last 10)
-        await redis.lpush(TIMELINE_VERSIONS_KEY, JSON.stringify(version));
-        await redis.ltrim(TIMELINE_VERSIONS_KEY, 0, 9);
+        // Only store a new version if there are actual changes
+        if (changes > 0 || !currentData) {
+            // Save new version with metadata
+            const version = {
+                data: body,
+                timestamp,
+                changes: changes || body.data?.length || 0
+            };
+
+            // Add to versions list (keep only last 10)
+            await redis.lpush(TIMELINE_VERSIONS_KEY, JSON.stringify(version));
+            await redis.ltrim(TIMELINE_VERSIONS_KEY, 0, 9);
+        }
 
         return NextResponse.json({
             success: true,
             timestamp,
             changes,
+            versionStored: changes > 0 || !currentData
         });
     } catch (error) {
         return NextResponse.json(

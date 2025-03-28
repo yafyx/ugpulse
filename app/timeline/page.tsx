@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from "react";
 import Timeline from "@/components/timeline";
 import { Spinner, Button } from "@heroui/react";
+import { addToast } from "@heroui/toast";
 import {
   fetchTimelineData,
   saveTimelineData,
   getLastFetchedFormatted,
+  getLatestVersionTimestamp,
 } from "@/lib/db/timeline";
 import { ENDPOINTS } from "@/lib/types";
 
@@ -90,12 +92,34 @@ export default function TimelinePage() {
       const data = await response.json();
 
       // Save to Redis
-      await saveTimelineData(data);
+      const result = await saveTimelineData(data);
 
       // Update local state
       setEventsData(data);
+
+      // Show appropriate toast notification
+      if (result.success) {
+        if (result.versionStored) {
+          addToast({
+            title: "Berhasil",
+            description: `Data berhasil diperbarui dengan ${result.changes} perubahan`,
+            color: "success",
+          });
+        } else {
+          addToast({
+            title: "Info",
+            description: "Tidak ada perubahan pada data kalender akademik",
+            color: "primary",
+          });
+        }
+      }
     } catch (error) {
       setEventsError(error);
+      addToast({
+        title: "Gagal",
+        description: "Gagal memperbarui data",
+        color: "danger",
+      });
       throw error;
     } finally {
       setIsRefreshing(false);
@@ -178,7 +202,7 @@ export default function TimelinePage() {
             <Timeline
               events={eventsData.data}
               onRefresh={refreshData}
-              lastUpdated={getLastFetchedFormatted()}
+              lastUpdated={getLatestVersionTimestamp(false)}
               isRefreshing={isRefreshing}
             />
           )}

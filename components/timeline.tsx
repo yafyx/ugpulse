@@ -533,33 +533,35 @@ const Timeline: React.FC<{
     >
       <Card className="overflow-hidden border border-zinc-200/20 bg-white/90 dark:border-zinc-700/30 dark:bg-zinc-900/90">
         <CardBody className="p-0">
-          <div className="flex items-center justify-between border-b border-zinc-200/30 p-4 dark:border-zinc-700/30">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col items-start justify-between gap-3 border-b border-zinc-200/30 p-4 dark:border-zinc-700/30 sm:flex-row sm:items-center">
+            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
               {lastUpdated && (
                 <Tooltip content="Klik untuk melihat riwayat pembaruan">
                   <Button
                     size="sm"
                     variant="flat"
-                    className="gap-2 bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
+                    className="w-full gap-2 bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60 sm:w-auto"
                     onClick={onHistoryModalOpen}
                   >
-                    <History className="h-4 w-4" />
-                    <span>Terakhir diupdate: {lastUpdated}</span>
+                    <History className="h-4 w-4 shrink-0" />
+                    <span className="truncate">
+                      Terakhir diupdate: {lastUpdated}
+                    </span>
                   </Button>
                 </Tooltip>
               )}
             </div>
-            <div className="ml-auto flex items-center gap-2">
+            <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:ml-auto sm:w-auto sm:justify-end">
               <div className="hidden rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-xs text-zinc-500 dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400 md:block">
                 Scroll untuk melihat lebih banyak
               </div>
-              <div className="block rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-xs text-zinc-500 dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400 md:hidden">
+              <div className="block w-full rounded-full border border-zinc-200/30 bg-zinc-100/10 px-3 py-1 text-center text-xs text-zinc-500 dark:border-zinc-700/30 dark:bg-zinc-800/30 dark:text-zinc-400 sm:w-auto md:hidden">
                 Geser untuk melihat timeline
               </div>
               <Button
                 size="sm"
                 variant="flat"
-                className="bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
+                className="w-full bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60 sm:w-auto"
                 onClick={() => {
                   // Scroll to current date
                   if (scrollContainerRef.current) {
@@ -793,9 +795,10 @@ const Timeline: React.FC<{
         isOpen={isEventModalOpen}
         onOpenChange={onEventModalOpenChange}
         classNames={{
-          base: "bg-white/95 dark:bg-zinc-900/95 border border-zinc-200/20 dark:border-zinc-700/20",
+          base: "bg-white/95 dark:bg-zinc-900/95 border border-zinc-200/20 dark:border-zinc-700/20 mx-4 max-w-[95vw] sm:mx-0",
           header: "border-b border-zinc-200/20 dark:border-zinc-700/20",
           footer: "border-t border-zinc-200/20 dark:border-zinc-700/20",
+          body: "gap-3",
         }}
         motionProps={{
           variants: {
@@ -822,26 +825,26 @@ const Timeline: React.FC<{
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1 text-zinc-800 dark:text-zinc-100">
-                <h2 className="text-lg font-semibold leading-none tracking-tight">
+                <h2 className="text-base font-semibold leading-none tracking-tight sm:text-lg">
                   {selectedEvent?.kegiatan}
                 </h2>
               </ModalHeader>
               <ModalBody>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 sm:text-start">
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
                   {selectedEvent?.tanggal}
                 </p>
                 <Link
                   showAnchorIcon
                   href="https://baak.gunadarma.ac.id/"
-                  className="truncate text-center text-xs text-zinc-500 transition duration-200 hover:text-zinc-800 dark:hover:text-zinc-200 sm:text-start"
+                  className="truncate text-xs text-zinc-500 transition duration-200 hover:text-zinc-800 dark:hover:text-zinc-200"
                 >
                   https://baak.gunadarma.ac.id/
                 </Link>
               </ModalBody>
-              <ModalFooter className="items-center justify-between">
+              <ModalFooter className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <Chip
                   variant="solid"
-                  className="border-0 bg-zinc-800/90 text-white"
+                  className="w-full border-0 bg-zinc-800/90 text-center text-white sm:w-auto"
                 >
                   {selectedEventStatus && selectedEventStatus.full === "Selesai"
                     ? "Selesai"
@@ -853,7 +856,7 @@ const Timeline: React.FC<{
                   size="sm"
                   variant="light"
                   onPress={onClose}
-                  className="bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
+                  className="w-full bg-zinc-100/50 text-zinc-800 hover:bg-zinc-200/60 dark:bg-zinc-800/50 dark:text-zinc-200 dark:hover:bg-zinc-700/60 sm:w-auto"
                 >
                   Tutup
                 </Button>
