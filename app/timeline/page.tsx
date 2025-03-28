@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Timeline from "@/components/timeline";
-import { Spinner, Button } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import {
   fetchTimelineData,
@@ -44,9 +44,11 @@ const fetcher = async (url: string) => {
 };
 
 export default function TimelinePage() {
-  const [eventsData, setEventsData] = useState<Kalender | null>(null);
+  const [eventsData, setEventsData] = useState<Kalender | null>({
+    status: "",
+    data: [],
+  });
   const [eventsError, setEventsError] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Load timeline data on initial render
@@ -55,7 +57,6 @@ export default function TimelinePage() {
   }, []);
 
   const loadData = async () => {
-    setIsLoading(true);
     try {
       const { data } = await fetchTimelineData();
       if (data) {
@@ -77,8 +78,6 @@ export default function TimelinePage() {
       }
     } catch (error) {
       setEventsError(error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -125,14 +124,6 @@ export default function TimelinePage() {
       setIsRefreshing(false);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-zinc-100 dark:bg-zinc-900">
-        <Spinner size="lg" color="default" />
-      </div>
-    );
-  }
 
   if (eventsError) {
     return (
@@ -198,14 +189,12 @@ export default function TimelinePage() {
         </div>
 
         <div className="w-full overflow-visible">
-          {eventsData && (
-            <Timeline
-              events={eventsData.data}
-              onRefresh={refreshData}
-              lastUpdated={getLatestVersionTimestamp(false)}
-              isRefreshing={isRefreshing}
-            />
-          )}
+          <Timeline
+            events={eventsData?.data || []}
+            onRefresh={refreshData}
+            lastUpdated={getLatestVersionTimestamp(false)}
+            isRefreshing={isRefreshing}
+          />
         </div>
       </div>
     </div>
