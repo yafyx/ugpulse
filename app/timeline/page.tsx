@@ -3,10 +3,10 @@ import React, { useState, useEffect } from "react";
 import Timeline from "@/components/timeline";
 import { Spinner, Button } from "@heroui/react";
 import {
-  getTimelineData,
+  fetchTimelineData,
   saveTimelineData,
   getLastFetchedFormatted,
-} from "@/lib/timelineStorage";
+} from "@/lib/db/timeline";
 import { ENDPOINTS } from "@/lib/types";
 
 interface Event {
@@ -49,48 +49,54 @@ export default function TimelinePage() {
 
   // Load timeline data on initial render
   useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-
-      try {
-        const { data } = getTimelineData();
-
-        if (data) {
-          setEventsData(data);
-          setIsLoading(false);
-        } else {
-          // If no local data, fetch from API
-          await fetchData();
-        }
-      } catch (error) {
-        setEventsError(error);
-        setIsLoading(false);
-      }
-    };
-
     loadData();
   }, []);
 
-  // Function to fetch fresh data from API
-  const fetchData = async () => {
+  const loadData = async () => {
+    setIsLoading(true);
     try {
-      const data = await fetcher(ENDPOINTS.kalender);
-      setEventsData(data);
-      saveTimelineData(data);
-      return data;
+      const { data } = await fetchTimelineData();
+      if (data) {
+        setEventsData(data);
+      } else {
+        // If no data in Redis, fetch from BAAK
+        try {
+          await refreshData();
+        } catch (error) {
+          console.error("Failed to fetch data from BAAK:", error);
+          setEventsError({
+            cause: {
+              isServerDown: true,
+              message:
+                "Tidak ada data kalender ditemukan dan gagal mengambil dari BAAK",
+            },
+          });
+        }
+      }
     } catch (error) {
       setEventsError(error);
-      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Function to refresh the timeline data
   const refreshData = async () => {
     setIsRefreshing(true);
     try {
-      await fetchData();
+      // Fetch from BAAK API
+      const response = await fetch(ENDPOINTS.kalender);
+      if (!response.ok) throw new Error("Failed to fetch from BAAK");
+
+      const data = await response.json();
+
+      // Save to Redis
+      await saveTimelineData(data);
+
+      // Update local state
+      setEventsData(data);
+    } catch (error) {
+      setEventsError(error);
+      throw error;
     } finally {
       setIsRefreshing(false);
     }

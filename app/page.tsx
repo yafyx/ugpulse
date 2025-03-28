@@ -28,10 +28,10 @@ import {
   ENDPOINTS,
 } from "@/lib/types";
 import {
-  getTimelineData,
+  fetchTimelineData,
   saveTimelineData,
   getLastFetchedFormatted,
-} from "@/lib/timelineStorage";
+} from "@/lib/db/timeline";
 
 const fetcher = async (url: string) => {
   const response = await fetch(url);
@@ -61,47 +61,56 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [eventsData, setEventsData] = useState<Kalender | null>(null);
-  const [isEventsLoading, setIsEventsLoading] = useState(false);
+  const [isEventsLoading, setIsEventsLoading] = useState(true);
   const [eventsError, setEventsError] = useState<any>(null);
   const [isRefreshingEvents, setIsRefreshingEvents] = useState(false);
 
   useEffect(() => {
-    const { data } = getTimelineData();
-    if (data) {
-      setEventsData(data);
-    } else {
-      // If no local data, fetch from API
-      fetchTimelineData();
-    }
+    loadTimelineData();
   }, []);
 
-  // Function to fetch timeline data
-  const fetchTimelineData = async () => {
+  const loadTimelineData = async () => {
     setIsEventsLoading(true);
-    setEventsError(null);
-
     try {
-      const data = await fetcher(ENDPOINTS.kalender);
-      setEventsData(data);
-      saveTimelineData(data);
-      setIsEventsLoading(false);
+      const { data } = await fetchTimelineData();
+      if (data) {
+        setEventsData(data);
+      } else {
+        // If no data in Redis, fetch from BAAK
+        try {
+          await refreshTimelineData();
+        } catch (error) {
+          console.error("Failed to fetch data from BAAK:", error);
+          setEventsError({
+            cause: {
+              isServerDown: true,
+              message:
+                "Tidak ada data kalender ditemukan dan gagal mengambil dari BAAK",
+            },
+          });
+        }
+      }
     } catch (error) {
       setEventsError(error);
+    } finally {
       setIsEventsLoading(false);
     }
   };
 
-  // Function to refresh timeline data
   const refreshTimelineData = async () => {
     setIsRefreshingEvents(true);
-
     try {
-      const data = await fetcher(ENDPOINTS.kalender);
+      const response = await fetch(ENDPOINTS.kalender);
+      if (!response.ok) throw new Error("Failed to fetch from BAAK");
+
+      const data = await response.json();
+
+      await saveTimelineData(data);
+
       setEventsData(data);
-      saveTimelineData(data);
-      setIsRefreshingEvents(false);
     } catch (error) {
       setEventsError(error);
+    } finally {
       setIsRefreshingEvents(false);
     }
   };
@@ -233,7 +242,7 @@ export default function Home() {
                 variant="flat"
                 color="primary"
                 size="sm"
-                onClick={fetchTimelineData}
+                onClick={loadTimelineData}
                 className="mx-auto"
               >
                 Muat Ulang
@@ -274,7 +283,7 @@ export default function Home() {
                 color="default"
                 size="sm"
                 className="mt-4"
-                onClick={fetchTimelineData}
+                onClick={loadTimelineData}
               >
                 Refresh
               </Button>

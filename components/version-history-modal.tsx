@@ -9,10 +9,7 @@ import {
   Chip,
   Divider,
 } from "@heroui/react";
-import {
-  getLastFetchedFormatted,
-  getTimelineHistory,
-} from "@/lib/timelineStorage";
+import { getLastFetchedFormatted, getTimelineHistory } from "@/lib/db/timeline";
 import { Clock, ArrowDownUp, RefreshCw } from "lucide-react";
 
 interface VersionHistoryModalProps {
