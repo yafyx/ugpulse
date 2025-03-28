@@ -1,11 +1,10 @@
 export function Footer() {
   return (
-    <footer
-      className="mt-12 w-full border-t border-zinc-200/20 bg-white/60 py-6 backdrop-blur-md dark:border-zinc-700/30 dark:bg-zinc-900/60"
-      aria-label="Footer"
-    >
-      <div className="container mx-auto flex flex-col items-center justify-center space-y-3 px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center space-x-4">made with 🫶 by yfyx.</div>
+    <footer className="w-full" aria-label="Footer">
+      <div className="mx-auto flex flex-col items-center justify-center">
+        <div className="select-none bg-gradient-to-r from-zinc-200/20 via-zinc-400/10 to-zinc-200/20 bg-clip-text text-[8rem] font-extrabold tracking-tighter text-transparent dark:from-zinc-800/20 dark:via-zinc-700/20 dark:to-zinc-800/20">
+          yfyx
+        </div>
       </div>
     </footer>
   );
